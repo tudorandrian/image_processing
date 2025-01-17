@@ -1,9 +1,9 @@
 Flask>=2.0.0
-torch>=1.10.0
+torch
 torchvision>=0.11.0
 torchaudio>=0.10.0
 pytorch-cuda>=11.8; platform_system != "Windows" or sys_platform == "win32"
-opencv-python>=4.5.5
+opencv-python
 Pillow>=8.0.0
 numpy>=1.21.0
 matplotlib>=3.4.3
