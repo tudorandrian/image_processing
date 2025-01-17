@@ -1,0 +1,19 @@
+name: image_processing
+channels:
+  - defaults
+  - pytorch
+  - nvidia
+dependencies:
+  - python=3.9
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=11.8
+  - flask
+  - opencv-python
+  - pillow
+  - numpy
+  - matplotlib
+  - pip
+  - pip:
+        - ultralytics
