@@ -90,6 +90,20 @@
         <label for="threshold2">Threshold 2:</label>
         <input type="number" name="threshold2" id="threshold2" value="200">
         <br>
+        <br>
+        <br>
+        <label for="equalization_type">Select equalization type:</label>
+        <select name="equalization_type" id="equalization_type">
+            <option value="ahe">Adaptive Histogram Equalization (AHE)</option>
+            <option value="clahe">Contrast-Limited Adaptive Histogram Equalization (CLAHE)</option>
+        </select>
+        <br>
+        <label for="clip_limit">Clip Limit (for CLAHE):</label>
+        <input type="number" name="clip_limit" id="clip_limit" value="2.0" step="0.1">
+        <br>
+        <label for="tile_grid_size">Tile Grid Size (for CLAHE):</label>
+        <input type="number" name="tile_grid_size" id="tile_grid_size" value="8">
+        <br>
         <!-- Submit button for the form -->
         <button type="submit">Upload</button>
     </form>

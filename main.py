@@ -43,6 +43,9 @@ def upload():
     edge_algorithm = request.form.get('edge_algorithm')
     threshold1 = request.form.get('threshold1', type=int, default=100)
     threshold2 = request.form.get('threshold2', type=int, default=200)
+    equalization_type = request.form.get('equalization_type')
+    clip_limit = request.form.get('clip_limit', type=float, default=2.0)
+    tile_grid_size = request.form.get('tile_grid_size', type=int, default=8)
 
     if file.filename == '':
         return jsonify({"error": "No selected file"})
@@ -59,7 +62,8 @@ def upload():
                                 rotation_angle=rotation_angle, scale_factor=scale_factor,
                                 crop_x=crop_x, crop_y=crop_y, crop_width=crop_width, crop_height=crop_height,
                                 flip_code=flip_code, filter_type=filter_type, kernel_size=kernel_size,
-                                edge_algorithm=edge_algorithm, threshold1=threshold1, threshold2=threshold2))
+                                edge_algorithm=edge_algorithm, threshold1=threshold1, threshold2=threshold2,
+                                equalization_type=equalization_type, clip_limit=clip_limit, tile_grid_size=tile_grid_size))
 
 @app.route('/results')
 def results():
@@ -78,6 +82,9 @@ def results():
     edge_algorithm = request.args.get('edge_algorithm')
     threshold1 = request.args.get('threshold1', type=int)
     threshold2 = request.args.get('threshold2', type=int)
+    equalization_type = request.args.get('equalization_type')
+    clip_limit = request.args.get('clip_limit', type=float)
+    tile_grid_size = request.args.get('tile_grid_size', type=int)
     image_path = os.path.join("uploads", filename)
 
     processed_image_path = process_image(image_path, action)
@@ -86,11 +93,13 @@ def results():
     transformed_image_path = transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, crop_width, crop_height, flip_code)
     filtered_image_path = apply_filter(image_path, filter_type, kernel_size)
     edge_detected_image_path = apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2)
+    equalized_image_path = apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size)
 
     return render_template('results.html', filename=filename, action=action, color_space=color_space,
                            processed_image=processed_image_path, segmented_image=segmented_image_path,
                            converted_image=converted_image_path, transformed_image=transformed_image_path,
-                           filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path)
+                           filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path,
+                           equalized_image=equalized_image_path)
 
 def process_image(image_path, action):
     image = Image.open(image_path)
@@ -227,6 +236,26 @@ def apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2):
     cv2.imwrite(edge_detected_image_path, edges)
 
     return edge_detected_image_filename
+
+def apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size):
+    # Read the image using OpenCV
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Apply the selected histogram equalization method
+    if equalization_type == 'ahe':
+        equalized_image = cv2.equalizeHist(image)
+    elif equalization_type == 'clahe':
+        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_grid_size, tile_grid_size))
+        equalized_image = clahe.apply(image)
+    else:
+        equalized_image = image
+
+    # Save the equalized image
+    equalized_image_filename = f"equalized_{os.path.basename(image_path)}"
+    equalized_image_path = os.path.join("uploads", equalized_image_filename)
+    cv2.imwrite(equalized_image_path, equalized_image)
+
+    return equalized_image_filename
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
