@@ -38,6 +38,7 @@ def upload():
         return jsonify({"error": "No file part or action selected"})
     file = request.files['image']
     action = request.form['action']
+    color_space = request.form['color_space']
 
     # Check if a file is selected
     if file.filename == '':
@@ -55,21 +56,24 @@ def upload():
         file.save(image_path)
 
         # Redirect to the results page with the filename and action as query parameters
-        return redirect(url_for('results', filename=filename, action=action))
+        return redirect(url_for('results', filename=filename, action=action, color_space=color_space))
 
 @app.route('/results')
 def results():
     # Get the filename and action from the query parameters
     filename = request.args.get('filename')
     action = request.args.get('action')
+    color_space = request.args.get('color_space')
     image_path = os.path.join("uploads", filename)
 
     # Process the image based on the selected action
     processed_image_path = process_image(image_path, action)
     segmented_image_path = segment_image(image_path, action)
+    # Convert the image to the selected color space
+    converted_image_path = convert_color_space(image_path, color_space)
 
     # Render the results page with the uploaded image, processed image, and segmented image
-    return render_template('results.html', filename=filename, action=action, processed_image=processed_image_path, segmented_image=segmented_image_path)
+    return render_template('results.html', filename=filename, action=action, color_space=color_space, processed_image=processed_image_path, segmented_image=segmented_image_path, converted_image=converted_image_path)
 
 def process_image(image_path, action):
     # Read and preprocess the image
@@ -163,6 +167,30 @@ def segment_image(image_path, action):
     Image.fromarray(blended_image).save(segmented_image_path)
 
     return segmented_image_filename
+
+def convert_color_space(image_path, color_space):
+    # Read the image using OpenCV
+    image = cv2.imread(image_path)
+
+    # Convert the image to the selected color space
+    if color_space == 'HSV':
+        converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    elif color_space == 'LAB':
+        converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+    elif color_space == 'GRAY':
+        converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        converted_image = image
+
+    # Save the converted image
+    converted_image_filename = f"converted_{os.path.basename(image_path)}"
+    converted_image_path = os.path.join("uploads", converted_image_filename)
+    cv2.imwrite(converted_image_path, converted_image)
+
+    # Log the conversion process
+    print(f"Converted image saved at: {converted_image_path} with color space: {color_space}")
+
+    return converted_image_filename
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

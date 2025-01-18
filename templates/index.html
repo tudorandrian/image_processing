@@ -14,7 +14,9 @@
     <!-- Form for uploading images and selecting actions -->
     <form action="/upload" method="post" enctype="multipart/form-data">
         <!-- Input for selecting an image file -->
-        <input type="file" name="image" required>
+        <label for="image">Select image:</label>
+        <input type="file" name="image" id="image" required>
+        <br>
         <!-- Dropdown menu for selecting an action -->
         <label>
             <select name="action" required>
@@ -25,6 +27,15 @@
                 <option value="trees">Check for Trees</option>
             </select>
         </label>
+        <br>
+        <label for="color_space">Select color space:</label>
+        <select name="color_space" id="color_space" required>
+            <option value="RGB">RGB</option>
+            <option value="HSV">HSV</option>
+            <option value="LAB">LAB</option>
+            <option value="GRAY">Grayscale</option>
+        </select>
+        <br>
         <!-- Submit button for the form -->
         <button type="submit">Upload</button>
     </form>

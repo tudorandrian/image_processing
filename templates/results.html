@@ -8,6 +8,10 @@
 <body>
     <h1>Image Processing Results</h1>
     <div>
+        <h2>Action: {{ action }}</h2>
+        <!-- Placeholder for additional results -->
+    </div>
+    <div>
         <h2>Uploaded Image</h2>
         <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
     </div>
@@ -20,8 +24,12 @@
         <img src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Segmented Image">
     </div>
     <div>
-        <h2>Action: {{ action }}</h2>
+        <h2>Color Space: {{ color_space }}</h2>
         <!-- Placeholder for additional results -->
+    </div>
+    <div>
+        <h2>Converted Image</h2>
+        <img src="{{ url_for('uploaded_file', filename=converted_image) }}" alt="Converted Image">
     </div>
 </body>
 </html>
