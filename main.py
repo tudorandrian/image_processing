@@ -112,16 +112,55 @@ def segment_image(image_path, action):
     # Perform segmentation
     with torch.no_grad():
         output = segmentation_model(image_tensor)['out'][0]
-    output_predictions = output.argmax(0)
+    output_predictions = output.argmax(0).byte().cpu().numpy()
 
     # Convert the segmentation map to an image
-    segmented_image = Image.fromarray(output_predictions.byte().cpu().numpy())
+    segmented_image = Image.fromarray(output_predictions)
     segmented_image = segmented_image.resize(image.size)
+
+    # Convert to numpy array for OpenCV processing
+    segmented_image_np = np.array(segmented_image)
+
+    # Customize properties
+    color_map = {
+        0: (0, 0, 0),  # Background
+        1: (0, 255, 0),  # Class 1
+        2: (0, 0, 255),  # Class 2
+        # Add more classes as needed
+    }
+    transparency = 0.5
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.5
+    font_thickness = 1
+
+    # Create an overlay for transparency
+    overlay = np.array(image).copy()
+    for class_id, color in color_map.items():
+        mask = (segmented_image_np == class_id)
+        overlay[mask] = color
+
+    # Blend the overlay with the original image
+    blended_image = cv2.addWeighted(np.array(image), 1 - transparency, overlay, transparency, 0)
+
+    # Draw contours around segmented regions
+    for class_id, color in color_map.items():
+        mask = (segmented_image_np == class_id).astype(np.uint8)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(blended_image, contours, -1, color, 2)
+
+    # Add labels to the segmented regions
+    for class_id, color in color_map.items():
+        mask = (segmented_image_np == class_id).astype(np.uint8)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for contour in contours:
+            x, y, w, h = cv2.boundingRect(contour)
+            label_text = f"Class {class_id}"
+            cv2.putText(blended_image, label_text, (x, y - 10), font, font_scale, color, font_thickness)
 
     # Save the segmented image
     segmented_image_filename = f"segmented_{os.path.basename(image_path)}"
     segmented_image_path = os.path.join("uploads", segmented_image_filename)
-    segmented_image.save(segmented_image_path)
+    Image.fromarray(blended_image).save(segmented_image_path)
 
     return segmented_image_filename
 
