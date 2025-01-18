@@ -3,7 +3,7 @@ import uuid
 import cv2
 import numpy as np
 from flask import Flask, request, jsonify, render_template, redirect, url_for, send_from_directory
-from PIL import Image
+from PIL import Image, ImageEnhance
 import torch
 from torchvision import transforms
 
@@ -46,6 +46,8 @@ def upload():
     equalization_type = request.form.get('equalization_type')
     clip_limit = request.form.get('clip_limit', type=float, default=2.0)
     tile_grid_size = request.form.get('tile_grid_size', type=int, default=8)
+    enhancement_type = request.form.get('enhancement_type')
+    enhancement_value = request.form.get('enhancement_value', type=float, default=1.0)
 
     if file.filename == '':
         return jsonify({"error": "No selected file"})
@@ -63,7 +65,8 @@ def upload():
                                 crop_x=crop_x, crop_y=crop_y, crop_width=crop_width, crop_height=crop_height,
                                 flip_code=flip_code, filter_type=filter_type, kernel_size=kernel_size,
                                 edge_algorithm=edge_algorithm, threshold1=threshold1, threshold2=threshold2,
-                                equalization_type=equalization_type, clip_limit=clip_limit, tile_grid_size=tile_grid_size))
+                                equalization_type=equalization_type, clip_limit=clip_limit, tile_grid_size=tile_grid_size,
+                                enhancement_type=enhancement_type, enhancement_value=enhancement_value))
 
 @app.route('/results')
 def results():
@@ -85,6 +88,8 @@ def results():
     equalization_type = request.args.get('equalization_type')
     clip_limit = request.args.get('clip_limit', type=float)
     tile_grid_size = request.args.get('tile_grid_size', type=int)
+    enhancement_type = request.args.get('enhancement_type')
+    enhancement_value = request.args.get('enhancement_value', type=float)
     image_path = os.path.join("uploads", filename)
 
     processed_image_path = process_image(image_path, action)
@@ -94,12 +99,13 @@ def results():
     filtered_image_path = apply_filter(image_path, filter_type, kernel_size)
     edge_detected_image_path = apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2)
     equalized_image_path = apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size)
+    enhanced_image_path = apply_image_enhancement(image_path, enhancement_type, enhancement_value)
 
     return render_template('results.html', filename=filename, action=action, color_space=color_space,
                            processed_image=processed_image_path, segmented_image=segmented_image_path,
                            converted_image=converted_image_path, transformed_image=transformed_image_path,
                            filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path,
-                           equalized_image=equalized_image_path)
+                           equalized_image=equalized_image_path, enhanced_image=enhanced_image_path)
 
 def process_image(image_path, action):
     image = Image.open(image_path)
@@ -256,6 +262,34 @@ def apply_histogram_equalization(image_path, equalization_type, clip_limit, tile
     cv2.imwrite(equalized_image_path, equalized_image)
 
     return equalized_image_filename
+
+def apply_image_enhancement(image_path, enhancement_type, enhancement_value):
+    # Read the image using PIL
+    image = Image.open(image_path)
+
+    # Apply the selected enhancement method
+    if enhancement_type == 'sharpen':
+        enhancer = ImageEnhance.Sharpness(image)
+    elif enhancement_type == 'denoise':
+        enhancer = ImageEnhance.Sharpness(image)  # Placeholder, use actual denoising method
+    elif enhancement_type == 'brightness':
+        enhancer = ImageEnhance.Brightness(image)
+    elif enhancement_type == 'contrast':
+        enhancer = ImageEnhance.Contrast(image)
+    else:
+        enhancer = None
+
+    if enhancer:
+        enhanced_image = enhancer.enhance(enhancement_value)
+    else:
+        enhanced_image = image
+
+    # Save the enhanced image
+    enhanced_image_filename = f"enhanced_{os.path.basename(image_path)}"
+    enhanced_image_path = os.path.join("uploads", enhanced_image_filename)
+    enhanced_image.save(enhanced_image_path)
+
+    return enhanced_image_filename
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

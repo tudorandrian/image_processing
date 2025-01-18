@@ -104,6 +104,18 @@
         <label for="tile_grid_size">Tile Grid Size (for CLAHE):</label>
         <input type="number" name="tile_grid_size" id="tile_grid_size" value="8">
         <br>
+        <br>
+        <label for="enhancement_type">Select enhancement type:</label>
+        <select name="enhancement_type" id="enhancement_type">
+            <option value="sharpen">Sharpen</option>
+            <option value="denoise">Denoise</option>
+            <option value="brightness">Adjust Brightness</option>
+            <option value="contrast">Adjust Contrast</option>
+        </select>
+        <br>
+        <label for="enhancement_value">Enhancement value:</label>
+        <input type="number" name="enhancement_value" id="enhancement_value" value="1.0" step="0.1">
+        <br>
         <!-- Submit button for the form -->
         <button type="submit">Upload</button>
     </form>
