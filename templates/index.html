@@ -28,6 +28,7 @@
             </select>
         </label>
         <br>
+        <br>
         <label for="color_space">Select color space:</label>
         <select name="color_space" id="color_space" required>
             <option value="RGB">RGB</option>
@@ -61,6 +62,16 @@
             <option value="0">Vertical</option>
             <option value="-1">Both</option>
         </select>
+        <br>
+        <br>
+        <label for="filter_type">Select filter type:</label>
+        <select name="filter_type" id="filter_type">
+            <option value="gaussian">Gaussian</option>
+            <option value="median">Median</option>
+        </select>
+        <br>
+        <label for="kernel_size">Kernel size:</label>
+        <input type="number" name="kernel_size" id="kernel_size" value="7">
         <br>
         <!-- Submit button for the form -->
         <button type="submit">Upload</button>
