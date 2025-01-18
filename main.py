@@ -40,6 +40,9 @@ def upload():
     flip_code = request.form.get('flip_code', type=int, default=1)
     filter_type = request.form.get('filter_type')
     kernel_size = request.form.get('kernel_size', type=int, default=7)
+    edge_algorithm = request.form.get('edge_algorithm')
+    threshold1 = request.form.get('threshold1', type=int, default=100)
+    threshold2 = request.form.get('threshold2', type=int, default=200)
 
     if file.filename == '':
         return jsonify({"error": "No selected file"})
@@ -55,7 +58,8 @@ def upload():
         return redirect(url_for('results', filename=filename, action=action, color_space=color_space,
                                 rotation_angle=rotation_angle, scale_factor=scale_factor,
                                 crop_x=crop_x, crop_y=crop_y, crop_width=crop_width, crop_height=crop_height,
-                                flip_code=flip_code, filter_type=filter_type, kernel_size=kernel_size))
+                                flip_code=flip_code, filter_type=filter_type, kernel_size=kernel_size,
+                                edge_algorithm=edge_algorithm, threshold1=threshold1, threshold2=threshold2))
 
 @app.route('/results')
 def results():
@@ -71,6 +75,9 @@ def results():
     flip_code = request.args.get('flip_code', type=int)
     filter_type = request.args.get('filter_type')
     kernel_size = request.args.get('kernel_size', type=int, default=7)
+    edge_algorithm = request.args.get('edge_algorithm')
+    threshold1 = request.args.get('threshold1', type=int)
+    threshold2 = request.args.get('threshold2', type=int)
     image_path = os.path.join("uploads", filename)
 
     processed_image_path = process_image(image_path, action)
@@ -78,11 +85,12 @@ def results():
     converted_image_path = convert_color_space(image_path, color_space)
     transformed_image_path = transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, crop_width, crop_height, flip_code)
     filtered_image_path = apply_filter(image_path, filter_type, kernel_size)
+    edge_detected_image_path = apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2)
 
     return render_template('results.html', filename=filename, action=action, color_space=color_space,
                            processed_image=processed_image_path, segmented_image=segmented_image_path,
                            converted_image=converted_image_path, transformed_image=transformed_image_path,
-                           filtered_image=filtered_image_path)
+                           filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path)
 
 def process_image(image_path, action):
     image = Image.open(image_path)
@@ -193,6 +201,32 @@ def apply_filter(image_path, filter_type, kernel_size):
     cv2.imwrite(filtered_image_path, filtered_image)
 
     return filtered_image_filename
+
+def apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2):
+    # Read the image using OpenCV
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Apply the selected edge detection algorithm
+    if edge_algorithm == 'canny':
+        edges = cv2.Canny(image, threshold1, threshold2)
+    elif edge_algorithm == 'sobel':
+        edges = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
+    elif edge_algorithm == 'scharr':
+        edges = cv2.Scharr(image, cv2.CV_64F, 1, 0)
+    elif edge_algorithm == 'roberts':
+        kernel = np.array([[1, 0], [0, -1]], dtype=np.float32)
+        edges = cv2.filter2D(image, -1, kernel)
+    elif edge_algorithm == 'log':
+        edges = cv2.Laplacian(image, cv2.CV_64F)
+    else:
+        edges = image
+
+    # Save the edge-detected image
+    edge_detected_image_filename = f"edge_detected_{os.path.basename(image_path)}"
+    edge_detected_image_path = os.path.join("uploads", edge_detected_image_filename)
+    cv2.imwrite(edge_detected_image_path, edges)
+
+    return edge_detected_image_filename
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

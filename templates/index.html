@@ -73,6 +73,23 @@
         <label for="kernel_size">Kernel size:</label>
         <input type="number" name="kernel_size" id="kernel_size" value="7">
         <br>
+        <br>
+        <br>
+        <label for="edge_algorithm">Select edge detection algorithm:</label>
+        <select name="edge_algorithm" id="edge_algorithm">
+            <option value="canny">Canny</option>
+            <option value="sobel">Sobel</option>
+            <option value="scharr">Scharr</option>
+            <option value="roberts">Roberts</option>
+            <option value="log">LoG</option>
+        </select>
+        <br>
+        <label for="threshold1">Threshold 1:</label>
+        <input type="number" name="threshold1" id="threshold1" value="100">
+        <br>
+        <label for="threshold2">Threshold 2:</label>
+        <input type="number" name="threshold2" id="threshold2" value="200">
+        <br>
         <!-- Submit button for the form -->
         <button type="submit">Upload</button>
     </form>
