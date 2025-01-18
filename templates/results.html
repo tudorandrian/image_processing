@@ -9,7 +9,7 @@
     <h1>Image Processing Results</h1>
     <div>
         <h2>Uploaded Image</h2>
-        <img src="/uploads/{{ filename }}" alt="Uploaded Image">
+        <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
     </div>
     <div>
         <h2>Action: {{ action }}</h2>

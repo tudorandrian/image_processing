@@ -1,11 +1,12 @@
 # Import necessary libraries
 import cv2
 import numpy as np
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, jsonify, render_template, redirect, url_for, send_from_directory
 import torch
 from torchvision import transforms
 from PIL import Image
 import os
+import uuid
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -21,11 +22,13 @@ preprocess = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
+
 # Define routes
 @app.route('/')
 def home():
     # Render the home page with the upload form
     return render_template('index.html')
+
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -40,12 +43,19 @@ def upload():
         return jsonify({"error": "No selected file"})
 
     if file:
+        # Generate a unique filename if the file already exists
+        filename = file.filename
+        image_path = os.path.join("uploads", filename)
+        if os.path.exists(image_path):
+            filename = f"{uuid.uuid4().hex}_{filename}"
+            image_path = os.path.join("uploads", filename)
+
         # Save the image to the uploads directory
-        image_path = os.path.join("uploads", file.filename)
         file.save(image_path)
 
         # Redirect to the results page with the filename and action as query parameters
-        return redirect(url_for('results', filename=file.filename, action=action))
+        return redirect(url_for('results', filename=filename, action=action))
+
 
 @app.route('/results')
 def results():
@@ -56,6 +66,13 @@ def results():
 
     # Render the results page with the uploaded image and selected action
     return render_template('results.html', filename=filename, action=action)
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    # Serve the uploaded file from the uploads directory
+    return send_from_directory('uploads', filename)
+
 
 def detect_objects(image_path):
     # Read and preprocess the image
@@ -72,6 +89,7 @@ def detect_objects(image_path):
         })
 
     return detections
+
 
 if __name__ == "__main__":
     # Create the uploads directory if it doesn't exist
