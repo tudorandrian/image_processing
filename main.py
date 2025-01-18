@@ -12,8 +12,11 @@ import uuid
 app = Flask(__name__)
 
 # Load pre-trained models
-# Example models: YOLOv5 for object detection and DeepLabV3 for semantic segmentation
+# YOLOv5 for object detection
 object_detection_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+# DeepLabV3 for image segmentation
+segmentation_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_resnet50', pretrained=True)
+segmentation_model.eval()
 
 # Define preprocessing transformations
 preprocess = transforms.Compose([
@@ -63,9 +66,10 @@ def results():
 
     # Process the image based on the selected action
     processed_image_path = process_image(image_path, action)
+    segmented_image_path = segment_image(image_path, action)
 
-    # Render the results page with the uploaded image and selected action
-    return render_template('results.html', filename=filename, action=action, processed_image=processed_image_path)
+    # Render the results page with the uploaded image, processed image, and segmented image
+    return render_template('results.html', filename=filename, action=action, processed_image=processed_image_path, segmented_image=segmented_image_path)
 
 def process_image(image_path, action):
     # Read and preprocess the image
@@ -84,6 +88,27 @@ def process_image(image_path, action):
     Image.fromarray(image_np).save(processed_image_path)
 
     return processed_image_filename
+
+def segment_image(image_path, action):
+    # Read and preprocess the image
+    image = Image.open(image_path)
+    image_tensor = preprocess(image).unsqueeze(0)
+
+    # Perform segmentation
+    with torch.no_grad():
+        output = segmentation_model(image_tensor)['out'][0]
+    output_predictions = output.argmax(0)
+
+    # Convert the segmentation map to an image
+    segmented_image = Image.fromarray(output_predictions.byte().cpu().numpy())
+    segmented_image = segmented_image.resize(image.size)
+
+    # Save the segmented image
+    segmented_image_filename = f"segmented_{os.path.basename(image_path)}"
+    segmented_image_path = os.path.join("uploads", segmented_image_filename)
+    segmented_image.save(segmented_image_path)
+
+    return segmented_image_filename
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

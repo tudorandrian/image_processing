@@ -16,6 +16,10 @@
         <img src="{{ url_for('uploaded_file', filename=processed_image) }}" alt="Processed Image">
     </div>
     <div>
+        <h2>Segmented Image</h2>
+        <img src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Segmented Image">
+    </div>
+    <div>
         <h2>Action: {{ action }}</h2>
         <!-- Placeholder for additional results -->
     </div>
