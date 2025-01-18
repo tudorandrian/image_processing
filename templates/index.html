@@ -1,14 +1,31 @@
+<!-- HTML document structure -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags for character set and viewport settings -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title of the web page -->
     <title>Image Processing</title>
 </head>
 <body>
+    <!-- Main heading of the application -->
     <h1>Welcome to the Image Processing Application</h1>
+    <!-- Form for uploading images and selecting actions -->
     <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="image">
+        <!-- Input for selecting an image file -->
+        <input type="file" name="image" required>
+        <!-- Dropdown menu for selecting an action -->
+        <label>
+            <select name="action" required>
+                <option value="humans">Check for Humans</option>
+                <option value="animals">Check for Animals</option>
+                <option value="fruits">Check for Fruits</option>
+                <option value="cars">Check for Cars</option>
+                <option value="trees">Check for Trees</option>
+            </select>
+        </label>
+        <!-- Submit button for the form -->
         <button type="submit">Upload</button>
     </form>
 </body>

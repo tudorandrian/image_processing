@@ -1,7 +1,7 @@
 # Import necessary libraries
 import cv2
 import numpy as np
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 import torch
 from torchvision import transforms
 from PIL import Image
@@ -24,27 +24,38 @@ preprocess = transforms.Compose([
 # Define routes
 @app.route('/')
 def home():
+    # Render the home page with the upload form
     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'image' not in request.files:
-        return jsonify({"error": "No file part"})
+    # Check if the image and action are in the request
+    if 'image' not in request.files or 'action' not in request.form:
+        return jsonify({"error": "No file part or action selected"})
     file = request.files['image']
+    action = request.form['action']
 
+    # Check if a file is selected
     if file.filename == '':
         return jsonify({"error": "No selected file"})
 
     if file:
-        # Save the image
+        # Save the image to the uploads directory
         image_path = os.path.join("uploads", file.filename)
         file.save(image_path)
 
-        # Process the image
-        detections = detect_objects(image_path)
+        # Redirect to the results page with the filename and action as query parameters
+        return redirect(url_for('results', filename=file.filename, action=action))
 
-        # Return results
-        return jsonify(detections)
+@app.route('/results')
+def results():
+    # Get the filename and action from the query parameters
+    filename = request.args.get('filename')
+    action = request.args.get('action')
+    image_path = os.path.join("uploads", filename)
+
+    # Render the results page with the uploaded image and selected action
+    return render_template('results.html', filename=filename, action=action)
 
 def detect_objects(image_path):
     # Read and preprocess the image
@@ -63,6 +74,8 @@ def detect_objects(image_path):
     return detections
 
 if __name__ == "__main__":
+    # Create the uploads directory if it doesn't exist
     if not os.path.exists('uploads'):
         os.makedirs('uploads')
+    # Run the Flask app in debug mode
     app.run(debug=True)
