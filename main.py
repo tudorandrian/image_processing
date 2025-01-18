@@ -80,7 +80,22 @@ def process_image(image_path, action):
     image_np = np.array(image)
     for result in results.xyxy[0]:
         bbox = result[:4].tolist()
-        cv2.rectangle(image_np, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
+        label = result[-1].item()  # Get the class label
+        confidence = result[-2].item()  # Get the confidence score
+
+        # Customize properties
+        color = (0, 255, 0)  # Green color
+        thickness = 3  # Line thickness
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.5
+        font_thickness = 1
+
+        # Draw the bounding box
+        cv2.rectangle(image_np, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color, thickness)
+
+        # Add label and confidence score
+        label_text = f"{label}: {confidence:.2f}"
+        cv2.putText(image_np, label_text, (int(bbox[0]), int(bbox[1]) - 10), font, font_scale, color, font_thickness)
 
     # Save the processed image
     processed_image_filename = f"processed_{os.path.basename(image_path)}"
