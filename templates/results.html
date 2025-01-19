@@ -26,6 +26,12 @@
                 <li>{{ detected_class }}</li>
             {% endfor %}
         </ul>
+        {% if 'person' in detected_classes %}
+        <div>
+            <h2>Image with Face Detection</h2>
+            <img src="{{ url_for('uploaded_file', filename=processed_image_person) }}" alt="Image with Face Detection">
+        </div>
+        {% endif %}
     </div>
     <div>
         <h2>Segmented Image</h2>

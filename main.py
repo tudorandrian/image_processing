@@ -105,7 +105,7 @@ def results():
     enhancement_value = request.args.get('enhancement_value', type=float)
     image_path = os.path.join("uploads", filename)
 
-    processed_image_path, detected_classes = process_image(image_path, action)
+    processed_image_path, detected_classes, processed_image_person_path = process_image(image_path, action)
     segmented_image_path = segment_image(image_path, action)
     converted_image_path = convert_color_space(image_path, color_space)
     transformed_image_path = transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, crop_width, crop_height, flip_code)
@@ -119,7 +119,7 @@ def results():
                            converted_image=converted_image_path, transformed_image=transformed_image_path,
                            filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path,
                            equalized_image=equalized_image_path, enhanced_image=enhanced_image_path,
-                           detected_classes=detected_classes)
+                           detected_classes=detected_classes, processed_image_person=processed_image_person_path)
 
 def process_image(image_path, action):
     image = Image.open(image_path)
@@ -128,6 +128,9 @@ def process_image(image_path, action):
 
     # List to store detected class names
     detected_classes = []
+
+    # Load the pre-trained face detection model
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
     for result in results.xyxy[0]:
         bbox = result[:4].tolist()
@@ -147,7 +150,24 @@ def process_image(image_path, action):
     processed_image_path = os.path.join("uploads", processed_image_filename)
     Image.fromarray(image_np).save(processed_image_path)
 
-    return processed_image_filename, list(set(detected_classes))
+    # Check if a person is detected
+    if 'person' in detected_classes:
+        # Convert the image to grayscale for face detection
+        gray_image = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
+        # Detect faces in the image
+        faces = face_cascade.detectMultiScale(gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+        # Draw a blue circle around each detected face
+        for (x, y, w, h) in faces:
+            center = (x + w // 2, y + h // 2)
+            radius = w // 2
+            cv2.circle(image_np, center, radius, (255, 0, 0), 3)
+
+    processed_image_person_filename = f"processed_person_{os.path.basename(image_path)}"
+    processed_image_person_path = os.path.join("uploads", processed_image_person_filename)
+    Image.fromarray(image_np).save(processed_image_person_path)
+
+    return processed_image_filename, list(set(detected_classes)), processed_image_person_filename
 
 def segment_image(image_path, action):
     image = Image.open(image_path)
