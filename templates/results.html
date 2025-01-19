@@ -147,14 +147,26 @@
             {% endfor %}
         {% endif %}
     </div>
+    <!-- Equalized Images Section -->
     <div>
         <h2>Equalized Images</h2>
-        {% if equalized_images|length > 1 %}
-            {% for image in equalized_images %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Equalized Image">
+        {% if result_option == 'all' %}
+            {% for equalization_type, image in equalized_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ equalization_type }} Image">
+                <h3>{{ equalization_type | capitalize }} Equalization</h3>
+                <p>{{ equalization_type_descriptions[equalization_type] }}</p>
             {% endfor %}
         {% else %}
-            <img src="{{ url_for('uploaded_file', filename=equalized_images[0]) }}" alt="Equalized Image">
+            {% if equalization_type in equalized_images %}
+                <img src="{{ url_for('uploaded_file', filename=equalized_images[equalization_type]) }}" alt="{{ equalization_type }} Image">
+                <h3>{{ equalization_type | capitalize }} Equalization</h3>
+                <p>{{ equalization_type_descriptions[equalization_type] }}</p>
+            {% endif %}
+            {% for equalization_type, image in equalized_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ equalization_type }} Image">
+                <h3>{{ equalization_type | capitalize }} Equalization</h3>
+                <p>{{ equalization_type_descriptions[equalization_type] }}</p>
+            {% endfor %}
         {% endif %}
     </div>
     <div>

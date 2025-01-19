@@ -142,13 +142,14 @@ def results():
 
         # Ensure converted_image_paths has enough elements
         converted_images = {}
-        color_spaces = ['HSV', 'LAB', 'GRAY']
+        color_spaces = ['RGB', 'HSV', 'LAB', 'GRAY']
         for i, cs in enumerate(color_spaces):
             if i < len(converted_image_paths):
                 converted_images[cs] = converted_image_paths[i]
 
         # Dictionary of color spaces with descriptions
         color_space_descriptions = {
+            'RGB': 'RGB color space.',
             'HSV': 'Hue, Saturation, and Value color space.',
             'LAB': 'CIE L*a*b* color space.',
             'GRAY': 'Grayscale color space.'
@@ -183,6 +184,19 @@ def results():
             'log': 'Laplacian of Gaussian (LoG) edge detection algorithm.'
         }
 
+        # Ensure equalized_image_paths has enough elements
+        equalized_images = {}
+        equalization_types = ['ahe', 'clahe']
+        for i, et in enumerate(equalization_types):
+            if i < len(equalized_image_paths):
+                equalized_images[et] = equalized_image_paths[i]
+
+        # Dictionary of equalization types with descriptions
+        equalization_type_descriptions = {
+            'ahe': 'Adaptive Histogram Equalization.',
+            'clahe': 'Contrast Limited Adaptive Histogram Equalization.'
+        }
+
         # Check if a person is detected and perform emotion detection
         emotions = []
         if 'person' in detected_classes:
@@ -191,14 +205,18 @@ def results():
         return render_template('results.html', filename=filename, result_option=result_option,
                                model_name=model_name, processed_image=processed_image_path,
                                processed_image_person=processed_image_person_path, emotions=emotions,
-                               segmented_image=segmented_image_path, segmentation_metrics=segmentation_metrics,
-                               color_space=color_space, converted_images=converted_images, color_space_descriptions=color_space_descriptions,
+                               segmented_image=segmented_image_path,
+                               color_space=color_space, converted_images=converted_images,
+                               color_space_descriptions=color_space_descriptions,
                                transformed_image=transformed_image_path,
-                               filter_type_loc=filter_type, filtered_images=filtered_images, filter_type_descriptions=filter_type_descriptions,
-                               equalized_images=equalized_image_paths,
+                               filtered_images=filtered_images, filter_type_descriptions=filter_type_descriptions,
+                               equalized_images=equalized_images,
+                               equalization_type_descriptions=equalization_type_descriptions,
                                enhanced_images=enhanced_image_paths,
                                detected_classes=detected_classes,
-                               edge_algorithm=edge_algorithm, edge_detected_images=edge_detected_images, edge_algorithm_descriptions=edge_algorithm_descriptions)
+                               segmentation_metrics=segmentation_metrics,
+                               edge_algorithm=edge_algorithm, edge_detected_images=edge_detected_images,
+                               edge_algorithm_descriptions=edge_algorithm_descriptions)
 
     except ValueError as e:
         flash(str(e))
