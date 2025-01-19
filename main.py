@@ -11,7 +11,7 @@ from deepface import DeepFace
 app = Flask(__name__)
 
 # Load pre-trained models
-object_detection_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+# object_detection_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 segmentation_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_resnet50', pretrained=True)
 segmentation_model.eval()
 
@@ -62,6 +62,8 @@ def upload():
     tile_grid_size = request.form.get('tile_grid_size', type=int, default=8)
     enhancement_type = request.form.get('enhancement_type')
     enhancement_value = request.form.get('enhancement_value', type=float, default=1.0)
+    # Capture the selected model from the form data
+    model_name = request.form['model']
 
     if file.filename == '':
         return jsonify({"error": "No selected file"})
@@ -80,8 +82,7 @@ def upload():
                                 flip_code=flip_code, filter_type=filter_type, kernel_size=kernel_size,
                                 edge_algorithm=edge_algorithm, threshold1=threshold1, threshold2=threshold2,
                                 equalization_type=equalization_type, clip_limit=clip_limit, tile_grid_size=tile_grid_size,
-                                enhancement_type=enhancement_type, enhancement_value=enhancement_value))
-
+                                enhancement_type=enhancement_type, enhancement_value=enhancement_value, model_name=model_name))
 
 def detect_emotions(image_path):
     """
@@ -123,7 +124,13 @@ def results():
         enhancement_value = request.args.get('enhancement_value', type=float)
         image_path = os.path.join("uploads", filename)
 
-        processed_image_path, detected_classes, processed_image_person_path = process_image(image_path)
+        # Get the selected model name from the request arguments
+        model_name = request.args.get('model_name')
+
+        # Load the selected object detection model
+        object_detection_model = torch.hub.load('ultralytics/yolov5', model_name)
+
+        processed_image_path, detected_classes, processed_image_person_path = process_image(image_path, object_detection_model)
         segmented_image_path, segmentation_metrics = segment_image(image_path)
 
         converted_image_paths = convert_color_space(image_path, color_space, result_option)
@@ -149,7 +156,7 @@ def results():
         flash(str(e))
         return redirect(url_for('index'))
 
-def process_image(image_path):
+def process_image(image_path, object_detection_model):
     image = Image.open(image_path)
     results = object_detection_model(image_path)
     image_np = np.array(image)

@@ -18,6 +18,14 @@
         <input type="file" name="image" id="image" required>
         <br>
         <br>
+        <!-- Add a select option for object detection model -->
+        <label for="model">Select object detection model:</label>
+        <select name="model" id="model" required>
+            <option value="yolov5s">YOLOv5s</option>
+            <option value="yolov5n">YOLOv5n</option>
+        </select>
+        <br>
+        <br>
         <!-- Add radio buttons for result selection -->
         <label for="result_option">Select result option:</label>
         <input type="radio" id="single_result" name="result_option" value="single" checked>
