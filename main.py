@@ -95,7 +95,7 @@ def detect_emotions(image_path):
         list: A list of dictionaries containing detected emotions and their probabilities.
     """
     # Analyze the image to detect emotions
-    results = DeepFace.analyze(img_path=image_path, actions=['emotion'])
+    results = DeepFace.analyze(img_path=image_path, actions=['emotion'], enforce_detection=False)
 
     return results
 
@@ -140,6 +140,20 @@ def results():
         equalized_image_paths = apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size, result_option)
         enhanced_image_paths = apply_image_enhancement(image_path, enhancement_type, enhancement_value, result_option)
 
+        # Ensure converted_image_paths has enough elements
+        converted_images = {}
+        color_spaces = ['HSV', 'LAB', 'GRAY']
+        for i, cs in enumerate(color_spaces):
+            if i < len(converted_image_paths):
+                converted_images[cs] = converted_image_paths[i]
+
+        # Dictionary of color spaces with descriptions
+        color_space_descriptions = {
+            'HSV': 'Hue, Saturation, and Value color space.',
+            'LAB': 'CIE L*a*b* color space.',
+            'GRAY': 'Grayscale color space.'
+        }
+
         # Ensure edge_detected_image_paths has enough elements
         edge_detected_images = {}
         algorithms = ['canny', 'sobel', 'scharr', 'roberts', 'log']
@@ -165,14 +179,16 @@ def results():
                                model_name=model_name, processed_image=processed_image_path,
                                processed_image_person=processed_image_person_path, emotions=emotions,
                                segmented_image=segmented_image_path,
-                               color_space=color_space, converted_images=converted_image_paths,
+                               color_space=color_space, converted_images=converted_images, color_space_descriptions=color_space_descriptions,
                                transformed_image=transformed_image_path,
                                filtered_images=filtered_image_paths,
                                equalized_images=equalized_image_paths,
                                enhanced_images=enhanced_image_paths,
                                detected_classes=detected_classes,
                                segmentation_metrics=segmentation_metrics,
-                               edge_algorithm=edge_algorithm, edge_detected_images=edge_detected_images, edge_algorithm_descriptions=edge_algorithm_descriptions)
+                               edge_algorithm=edge_algorithm, edge_detected_images=edge_detected_images,
+                               edge_algorithm_descriptions=edge_algorithm_descriptions)
+
     except ValueError as e:
         flash(str(e))
         return redirect(url_for('index'))

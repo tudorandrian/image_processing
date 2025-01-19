@@ -77,14 +77,26 @@
         <h2>Color Space: {{ color_space }}</h2>
         <!-- Placeholder for additional results -->
     </div>
+    <!-- Converted Images Section -->
     <div>
         <h2>Converted Images</h2>
-        {% if converted_images|length > 1 %}
-            {% for image in converted_images %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Converted Image">
+        {% if result_option == 'all' %}
+            {% for color_space, image in converted_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ color_space }} Image">
+                <h3>{{ color_space }} Color Space</h3>
+                <p>{{ color_space_descriptions[color_space] }}</p>
             {% endfor %}
         {% else %}
-            <img src="{{ url_for('uploaded_file', filename=converted_images[0]) }}" alt="Converted Image">
+            {% if color_space in converted_images %}
+                <img src="{{ url_for('uploaded_file', filename=converted_images[color_space]) }}" alt="{{ color_space }} Image">
+                <h3>{{ color_space }} Color Space</h3>
+                <p>{{ color_space_descriptions[color_space] }}</p>
+            {% endif %}
+            {% for color_space, image in converted_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ color_space }} Image">
+                <h3>{{ color_space }} Color Space</h3>
+                <p>{{ color_space_descriptions[color_space] }}</p>
+            {% endfor %}
         {% endif %}
     </div>
     <div>
