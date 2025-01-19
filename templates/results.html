@@ -1,190 +1,322 @@
+<!-- HTML document structure -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Processing Results</title>
+	<!-- Meta tags for character set and viewport settings -->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Title of the web page -->
+	<title>Image Processing - Results</title>
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+	      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+	        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+	        crossorigin="anonymous"></script>
 </head>
 <body>
-    <h1>Image Processing Results</h1>
-    <div>
-        <h2>Selected model name: {{ model_name }}</h2>
-    </div>
-    <div>
-        <h2>Uploaded/Original Image</h2>
-        <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
-    </div>
-    <div>
-        <h2>Processed Image</h2>
-        <img src="{{ url_for('uploaded_file', filename=processed_image) }}" alt="Processed Image">
-    </div>
-    <div>
-        <h2>Detected Objects</h2>
-        <ul>
-            {% for detected_class in detected_classes %}
-                <li>{{ detected_class }}</li>
-            {% endfor %}
-        </ul>
-        {% if 'person' in detected_classes %}
-        <div>
-            <h2>Image with Face Detection</h2>
-            <img src="{{ url_for('uploaded_file', filename=processed_image_person) }}" alt="Image with Face Detection">
-        </div>
-        {% endif %}
-    </div>
-    {% if 'person' in detected_classes %}
-    <div>
-        <h2>Emotion Analysis Results</h2>
-        <table>
-            <tr>
-                <th>Dominant Emotion</th>
-                <th>Face Confidence</th>
-                <th>Emotions</th>
-                <th>Region</th>
-            </tr>
-            {% for result in emotions %}
-            <tr>
-                <td>{{ result['dominant_emotion'] }}</td>
-                <td>{{ result['face_confidence'] }}</td>
-                <td>
-                    <ul>
-                        {% for emotion, value in result['emotion'].items() %}
-                        <li>{{ emotion }}: {{ value }}</li>
-                        {% endfor %}
-                    </ul>
-                </td>
-                <td>{{ result['region'] }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-    {% endif %}
-    <div>
-        <h2>Segmented Image</h2>
-        <img src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Segmented Image">
-    </div>
-    <!-- Add a section to display segmentation metrics -->
-    <div>
-        <h2>Segmentation Metrics</h2>
-        <ul>
-            <li>Number of Segments: {{ segmentation_metrics.num_segments }}</li>
-            {% for segment in segmentation_metrics.segments[:10] %}
-                <li>Segment ID: {{ segment.segment_id }}, Area: {{ segment.area }}, Percentage: {{ segment.percentage }}%</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div>
-        <h2>Color Space: {{ color_space }}</h2>
-        <!-- Placeholder for additional results -->
-    </div>
-    <!-- Converted Images Section -->
-    <div>
-        <h2>Converted Images</h2>
-        {% if result_option == 'all' %}
-            {% for color_space, image in converted_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ color_space }} Image">
-                <h3>{{ color_space }} Color Space</h3>
-                <p>{{ color_space_descriptions[color_space] }}</p>
-            {% endfor %}
-        {% else %}
-            {% if color_space in converted_images %}
-                <img src="{{ url_for('uploaded_file', filename=converted_images[color_space]) }}" alt="{{ color_space }} Image">
-                <h3>{{ color_space }} Color Space</h3>
-                <p>{{ color_space_descriptions[color_space] }}</p>
-            {% endif %}
-            {% for color_space, image in converted_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ color_space }} Image">
-                <h3>{{ color_space }} Color Space</h3>
-                <p>{{ color_space_descriptions[color_space] }}</p>
-            {% endfor %}
-        {% endif %}
-    </div>
-    <div>
-        <h2>Transformed Image</h2>
-        <img src="{{ url_for('uploaded_file', filename=transformed_image) }}" alt="Transformed Image">
-    </div>
-    <!-- Filtered Images Section -->
-    <div>
-        <h2>Filtered Images</h2>
-        {% if result_option == 'all' %}
-            {% for filter_type, image in filtered_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ filter_type }} Image">
-                <h3>{{ filter_type | capitalize }} Filter</h3>
-                <p>{{ filter_type_descriptions[filter_type] }}</p>
-            {% endfor %}
-        {% else %}
-            {% if filter_type in filtered_images %}
-                <img src="{{ url_for('uploaded_file', filename=filtered_images[filter_type]) }}" alt="{{ filter_type }} Image">
-                <h3>{{ filter_type | capitalize }} Filter</h3>
-                <p>{{ filter_type_descriptions[filter_type] }}</p>
-            {% endif %}
-            {% for filter_type, image in filtered_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ filter_type }} Image">
-                <h3>{{ filter_type | capitalize }} Filter</h3>
-                <p>{{ filter_type_descriptions[filter_type] }}</p>
-            {% endfor %}
-        {% endif %}
-    </div>
-    <!-- Edge-detected Images Section -->
-    <div>
-        <h2>Edge-detected Images</h2>
-        {% if result_option == 'all' %}
-            {% for algorithm, image in edge_detected_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ algorithm }} Image">
-                <h3>{{ algorithm | capitalize }} Algorithm</h3>
-                <p>{{ edge_algorithm_descriptions[algorithm] }}</p>
-            {% endfor %}
-        {% else %}
-            {% if edge_algorithm in edge_detected_images %}
-                <img src="{{ url_for('uploaded_file', filename=edge_detected_images[edge_algorithm]) }}" alt="{{ edge_algorithm }} Image">
-                <h3>{{ edge_algorithm | capitalize }} Algorithm</h3>
-                <p>{{ edge_algorithm_descriptions[edge_algorithm] }}</p>
-            {% endif %}
-            {% for algorithm, image in edge_detected_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ algorithm }} Image">
-                <h3>{{ algorithm | capitalize }} Algorithm</h3>
-                <p>{{ edge_algorithm_descriptions[algorithm] }}</p>
-            {% endfor %}
-        {% endif %}
-    </div>
-    <!-- Equalized Images Section -->
-    <div>
-        <h2>Equalized Images</h2>
-        {% if result_option == 'all' %}
-            {% for equalization_type, image in equalized_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ equalization_type }} Image">
-                <h3>{{ equalization_type | capitalize }} Equalization</h3>
-                <p>{{ equalization_type_descriptions[equalization_type] }}</p>
-            {% endfor %}
-        {% else %}
-            {% if equalization_type in equalized_images %}
-                <img src="{{ url_for('uploaded_file', filename=equalized_images[equalization_type]) }}" alt="{{ equalization_type }} Image">
-                <h3>{{ equalization_type | capitalize }} Equalization</h3>
-                <p>{{ equalization_type_descriptions[equalization_type] }}</p>
-            {% endif %}
-            {% for equalization_type, image in equalized_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ equalization_type }} Image">
-                <h3>{{ equalization_type | capitalize }} Equalization</h3>
-                <p>{{ equalization_type_descriptions[equalization_type] }}</p>
-            {% endfor %}
-        {% endif %}
-    </div>
-    <!-- Enhanced Images Section -->
-    <div>
-        <h2>Enhanced Images</h2>
-        {% if result_option == 'all' %}
-            {% for enhancement_type, image in enhanced_images.items() %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ enhancement_type }} Image">
-                <h3>{{ enhancement_type | capitalize }} Enhancement</h3>
-                <p>{{ enhancement_type_descriptions[enhancement_type] }}</p>
-            {% endfor %}
-        {% else %}
-            {% if enhancement_type in enhanced_images %}
-                <img src="{{ url_for('uploaded_file', filename=enhanced_images[enhancement_type]) }}" alt="{{ enhancement_type }} Image">
-                <h3>{{ enhancement_type | capitalize }} Enhancement</h3>
-                <p>{{ enhancement_type_descriptions[enhancement_type] }}</p>
-            {% endif %}
-        {% endif %}
-    </div>
+
+<div class="container">
+	<header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+		<a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+			<span class="fs-4">UVT Computer Vision AT</span>
+		</a>
+		
+		<ul class="nav nav-pills">
+			<li class="nav-item"><a href="/" class="nav-link active" aria-current="page">Pagina principală</a></li>
+			<li class="nav-item"><a href="/results" class="nav-link">Rezultate</a></li>
+		</ul>
+	</header>
+</div>
+
+<div class="container">
+	{% if image_files %}
+	<h1 class="text-center">Previous Uploaded and Processed Images</h1>
+	<div>
+		{% for image in image_files %}
+		<img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ image }}" width="200">
+		{% endfor %}
+	</div>
+	{% else %}
+	<h1 class="text-center">Image Processing Results</h1>
+	<div>
+		<h2>Selected model name: {{ model_name }}</h2>
+	</div>
+	
+	<hr class="m-5">
+	
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h2>Uploaded/Original Image</h2>
+				<img class="img-fluid" src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
+			</div>
+			<div class="col">
+				<h2>Transformed Image</h2>
+				<img src="{{ url_for('uploaded_file', filename=transformed_image) }}" alt="Transformed Image">
+			</div>
+		</div>
+	</div>
+	
+	<hr class="m-5">
+	
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h2>Processed Image</h2>
+				<img class="img-fluid" src="{{ url_for('uploaded_file', filename=processed_image) }}" alt="Processed Image">
+			</div>
+			<div class="col">
+				<h2>Detected Objects</h2>
+				<ul>
+					{% for detected_class in detected_classes %}
+					<li>{{ detected_class }}</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<hr class="m-5">
+	
+	{% if 'person' in detected_classes %}
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h2>Image with Face Detection</h2>
+			<img src="{{ url_for('uploaded_file', filename=processed_image_person) }}" alt="Image with Face Detection">
+			</div>
+			<div class="col">
+				<h2>Emotion Analysis Results</h2>
+				<table class="table">
+					<tr>
+						<th scope="col">Dominant Emotion</th>
+						<th scope="col">Face Confidence</th>
+						<th scope="col">Emotions</th>
+						<th scope="col">Region</th>
+					</tr>
+					{% for result in emotions %}
+					<tr>
+						<td>{{ result['dominant_emotion'] }}</td>
+						<td>{{ result['face_confidence'] }}</td>
+						<td>
+							{% for emotion, value in result['emotion'].items() %}
+							- {{ emotion }}: {{ value }} <br>
+							{% endfor %}
+						</td>
+						<td>{{ result['region'] }}</td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<hr class="m-5">
+	
+	{% endif %}
+	
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h2>Segmented Image</h2>
+				<img class="img-fluid" src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Segmented Image">
+			</div>
+			<div class="col">
+				<h2>Segmentation Metrics</h2>
+				<ul>
+					<li>Number of Segments: {{ segmentation_metrics.num_segments }}</li>
+					{% for segment in segmentation_metrics.segments[:10] %}
+					<li>Segment ID: {{ segment.segment_id }}, Area: {{ segment.area }}, Percentage: {{ segment.percentage }}%
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<hr class="m-5">
+	
+	<!-- Filtered Images Section -->
+	<div>
+		<h2>Filtered Images</h2>
+		{% if result_option == 'all' %}
+		<div class="container text-center">
+			<div class="row">
+				{% for filter_type, image in filtered_images.items() %}
+				<div class="col">
+					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}"
+					     alt="{{ filter_type }} Image">
+					<h3>{{ filter_type | capitalize }} Filter</h3>
+					<p>{{ filter_type_descriptions[filter_type] }}</p>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% else %}
+		{% if filter_type in filtered_images %}
+		<img src="{{ url_for('uploaded_file', filename=filtered_images[filter_type]) }}" alt="{{ filter_type }} Image">
+		<h3>{{ filter_type | capitalize }} Filter</h3>
+		<p>{{ filter_type_descriptions[filter_type] }}</p>
+		{% endif %}
+		{% for filter_type, image in filtered_images.items() %}
+		<img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ filter_type }} Image">
+		<h3>{{ filter_type | capitalize }} Filter</h3>
+		<p>{{ filter_type_descriptions[filter_type] }}</p>
+		{% endfor %}
+		{% endif %}
+	</div>
+	
+	<hr class="m-5">
+	
+	<!-- Equalized Images Section -->
+	<div>
+		<h2>Equalized Images</h2>
+		{% if result_option == 'all' %}
+		<div class="container text-center">
+			<div class="row">
+				{% for equalization_type, image in equalized_images.items() %}
+				<div class="col">
+					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}"
+					     alt="{{ equalization_type }} Image">
+					<h3>{{ equalization_type | capitalize }} Equalization</h3>
+					<p>{{ equalization_type_descriptions[equalization_type] }}</p>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% else %}
+		{% if equalization_type in equalized_images %}
+		<img src="{{ url_for('uploaded_file', filename=equalized_images[equalization_type]) }}"
+		     alt="{{ equalization_type }} Image">
+		<h3>{{ equalization_type | capitalize }} Equalization</h3>
+		<p>{{ equalization_type_descriptions[equalization_type] }}</p>
+		{% endif %}
+		{% for equalization_type, image in equalized_images.items() %}
+		<img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ equalization_type }} Image">
+		<h3>{{ equalization_type | capitalize }} Equalization</h3>
+		<p>{{ equalization_type_descriptions[equalization_type] }}</p>
+		{% endfor %}
+		{% endif %}
+	</div>
+	
+	<hr class="m-5">
+	
+	<!-- Enhanced Images Section -->
+	<div>
+		<h2>Enhanced Images</h2>
+		{% if result_option == 'all' %}
+		<div class="container text-center">
+			<div class="row">
+				{% for enhancement_type, image in enhanced_images.items() %}
+				<div class="col">
+					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}"
+					     alt="{{ enhancement_type }} Image">
+					<h3>{{ enhancement_type | capitalize }} Enhancement</h3>
+					<p>{{ enhancement_type_descriptions[enhancement_type] }}</p>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% else %}
+		{% if enhancement_type in enhanced_images %}
+		<img src="{{ url_for('uploaded_file', filename=enhanced_images[enhancement_type]) }}"
+		     alt="{{ enhancement_type }} Image">
+		<h3>{{ enhancement_type | capitalize }} Enhancement</h3>
+		<p>{{ enhancement_type_descriptions[enhancement_type] }}</p>
+		{% endif %}
+		{% endif %}
+	</div>
+	
+	<hr class="m-5">
+	
+	<div>
+		<h2>Color Space: {{ color_space }}</h2>
+		<!-- Placeholder for additional results -->
+	</div>
+	<!-- Converted Images Section -->
+	<div>
+		<h2>Converted Images</h2>
+		{% if result_option == 'all' %}
+		<div class="container text-center">
+			<div class="row">
+				{% for color_space, image in converted_images.items() %}
+				<div class="col">
+					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}"
+					     alt="{{ color_space }} Image">
+					<h3>{{ color_space }} Color Space</h3>
+					<p>{{ color_space_descriptions[color_space] }}</p>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% else %}
+		{% if color_space in converted_images %}
+		<img src="{{ url_for('uploaded_file', filename=converted_images[color_space]) }}" alt="{{ color_space }} Image">
+		<h3>{{ color_space }} Color Space</h3>
+		<p>{{ color_space_descriptions[color_space] }}</p>
+		{% endif %}
+		{% for color_space, image in converted_images.items() %}
+		<img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ color_space }} Image">
+		<h3>{{ color_space }} Color Space</h3>
+		<p>{{ color_space_descriptions[color_space] }}</p>
+		{% endfor %}
+		{% endif %}
+	</div>
+
+	<hr class="m-5">
+	
+	<!-- Edge-detected Images Section -->
+	<div>
+		<h2>Edge-detected Images</h2>
+		{% if result_option == 'all' %}
+		<div class="container text-center">
+			<div class="row">
+				{% for algorithm, image in edge_detected_images.items() %}
+				<div class="col">
+					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}"
+					     alt="{{ algorithm }} Image">
+					<h3>{{ algorithm | capitalize }} Algorithm</h3>
+					<p>{{ edge_algorithm_descriptions[algorithm] }}</p>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+		{% else %}
+		{% if edge_algorithm in edge_detected_images %}
+		<img src="{{ url_for('uploaded_file', filename=edge_detected_images[edge_algorithm]) }}"
+		     alt="{{ edge_algorithm }} Image">
+		<h3>{{ edge_algorithm | capitalize }} Algorithm</h3>
+		<p>{{ edge_algorithm_descriptions[edge_algorithm] }}</p>
+		{% endif %}
+		{% for algorithm, image in edge_detected_images.items() %}
+		<img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ algorithm }} Image">
+		<h3>{{ algorithm | capitalize }} Algorithm</h3>
+		<p>{{ edge_algorithm_descriptions[algorithm] }}</p>
+		{% endfor %}
+		{% endif %}
+	</div>
+	{% endif %}
+</div>
+
+<div class="container">
+	<footer class="py-3 my-4">
+		<ul class="nav justify-content-center border-bottom pb-3 mb-3">
+			<li class="nav-item"><a href="/" class="nav-link px-2 text-body-secondary">Pagina principală</a></li>
+			<li class="nav-item"><a href="/results" class="nav-link px-2 text-body-secondary">Rezultate</a></li>
+			<li class="nav-item"><a href="mailto:tudor.andrian00@e-uvt.ro" class="nav-link px-2 text-body-secondary">Contact</a>
+			</li>
+		</ul>
+		<p class="text-center text-body-secondary">&copy; 2024 UVT Computer Vision AT</p>
+	</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+
 </body>
 </html>

@@ -11,7 +11,6 @@ from deepface import DeepFace
 app = Flask(__name__)
 
 # Load pre-trained models
-# object_detection_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 segmentation_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_resnet50', pretrained=True)
 segmentation_model.eval()
 
@@ -102,6 +101,12 @@ def detect_emotions(image_path):
 @app.route('/results')
 def results():
     try:
+        # Check if any query parameters are provided
+        if not request.args:
+            # List all image files in the uploads directory
+            image_files = [f for f in os.listdir('uploads') if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+            return render_template('results.html', image_files=image_files)
+
         filename = request.args.get('filename')
         result_option = request.args.get('result_option')
         color_space = request.args.get('color_space')
@@ -332,10 +337,12 @@ def convert_color_space(image_path, color_space, result_option):
 
     if result_option == 'all':
         # Return all color space conversions
-        color_spaces = ['HSV', 'LAB', 'GRAY']
+        color_spaces = ['RGB', 'HSV', 'LAB', 'GRAY']
         for cs in color_spaces:
             if cs == 'HSV':
                 converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+            elif cs == 'RGB':
+                converted_image = image
             elif cs == 'LAB':
                 converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
             elif cs == 'GRAY':
