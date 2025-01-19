@@ -37,6 +37,16 @@
         <h2>Segmented Image</h2>
         <img src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Segmented Image">
     </div>
+    <!-- Add a section to display segmentation metrics -->
+    <div>
+        <h2>Segmentation Metrics</h2>
+        <ul>
+            <li>Number of Segments: {{ segmentation_metrics.num_segments }}</li>
+            {% for segment in segmentation_metrics.segments %}
+                <li>Segment ID: {{ segment.segment_id }}, Area: {{ segment.area }}, Percentage: {{ segment.percentage }}%</li>
+            {% endfor %}
+        </ul>
+    </div>
     <div>
         <h2>Color Space: {{ color_space }}</h2>
         <!-- Placeholder for additional results -->

@@ -106,7 +106,9 @@ def results():
     image_path = os.path.join("uploads", filename)
 
     processed_image_path, detected_classes, processed_image_person_path = process_image(image_path, action)
-    segmented_image_path = segment_image(image_path, action)
+    segmented_image_path, segmentation_metrics = segment_image(image_path, action)
+
+
     converted_image_path = convert_color_space(image_path, color_space)
     transformed_image_path = transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, crop_width, crop_height, flip_code)
     filtered_image_path = apply_filter(image_path, filter_type, kernel_size)
@@ -114,12 +116,20 @@ def results():
     equalized_image_path = apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size)
     enhanced_image_path = apply_image_enhancement(image_path, enhancement_type, enhancement_value)
 
+    # Check if the segmented image file exists
+    # if not os.path.exists(segmented_image_path):
+    #     raise FileNotFoundError(f"Segmented image file not found: {segmented_image_path}")
+    #
+    # segmented_image_np = np.array(Image.open(segmented_image_path))
+    # segmentation_metrics = calculate_segmentation_metrics(segmented_image_np)
+
     return render_template('results.html', filename=filename, action=action, color_space=color_space,
                            processed_image=processed_image_path, segmented_image=segmented_image_path,
                            converted_image=converted_image_path, transformed_image=transformed_image_path,
                            filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path,
                            equalized_image=equalized_image_path, enhanced_image=enhanced_image_path,
-                           detected_classes=detected_classes, processed_image_person=processed_image_person_path)
+                           detected_classes=detected_classes, processed_image_person=processed_image_person_path,
+                           segmentation_metrics=segmentation_metrics)
 
 def process_image(image_path, action):
     image = Image.open(image_path)
@@ -199,10 +209,15 @@ def segment_image(image_path, action):
             x, y, w, h = cv2.boundingRect(contour)
             label_text = f"Class {class_id}"
             cv2.putText(blended_image, label_text, (x, y - 10), font, font_scale, color, font_thickness)
+
     segmented_image_filename = f"segmented_{os.path.basename(image_path)}"
     segmented_image_path = os.path.join("uploads", segmented_image_filename)
     Image.fromarray(blended_image).save(segmented_image_path)
-    return segmented_image_filename
+
+    segmented_image_np = np.array(Image.open(segmented_image_path))
+    segmentation_metrics = calculate_segmentation_metrics(segmented_image_np)
+
+    return segmented_image_filename, segmentation_metrics
 
 def convert_color_space(image_path, color_space):
     image = cv2.imread(image_path)
@@ -242,6 +257,11 @@ def transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, cr
 def apply_filter(image_path, filter_type, kernel_size):
     # Read the image using OpenCV
     image = cv2.imread(image_path)
+
+
+    # Ensure kernel size is odd and greater than 1
+    if kernel_size % 2 == 0 or kernel_size <= 1:
+        raise ValueError("Kernel size must be an odd number and greater than 1")
 
     # Apply the selected filter
     if filter_type == 'gaussian':
@@ -331,6 +351,34 @@ def apply_image_enhancement(image_path, enhancement_type, enhancement_value):
     enhanced_image.save(enhanced_image_path)
 
     return enhanced_image_filename
+
+# Function to calculate segmentation metrics
+def calculate_segmentation_metrics(segmented_image_np):
+    """
+    Calculate segmentation metrics such as the area of each segmented region,
+    the number of segments, and the percentage of the image covered by each class.
+
+    Args:
+        segmented_image_np (numpy.ndarray): The segmented image as a NumPy array.
+
+    Returns:
+        dict: A dictionary containing the segmentation metrics.
+    """
+    unique, counts = np.unique(segmented_image_np, return_counts=True)
+    total_pixels = segmented_image_np.size
+    metrics = {
+        "num_segments": len(unique),
+        "segments": []
+    }
+    for segment, count in zip(unique, counts):
+        area = count
+        percentage = (count / total_pixels) * 100
+        metrics["segments"].append({
+            "segment_id": int(segment),
+            "area": area,
+            "percentage": percentage
+        })
+    return metrics
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
