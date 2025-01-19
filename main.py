@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 from PIL import Image, ImageEnhance
 import torch
 from torchvision import transforms
+from deepface import DeepFace
 
 app = Flask(__name__)
 
@@ -81,6 +82,28 @@ def upload():
                                 equalization_type=equalization_type, clip_limit=clip_limit, tile_grid_size=tile_grid_size,
                                 enhancement_type=enhancement_type, enhancement_value=enhancement_value))
 
+
+def detect_emotions(image_path):
+    """
+    Detect emotions on faces in the given image.
+
+    Args:
+        image_path (str): Path to the input image.
+
+    Returns:
+        list: A list of dictionaries containing detected emotions and their probabilities.
+    """
+    # Analyze the image to detect emotions
+    results = DeepFace.analyze(img_path=image_path, actions=['emotion'])
+
+    # print(results)
+    # print(type(results))
+
+    # Extract the emotion analysis results
+    # emotions = results['emotion']
+
+    return results
+
 @app.route('/results')
 def results():
     filename = request.args.get('filename')
@@ -123,13 +146,18 @@ def results():
     # segmented_image_np = np.array(Image.open(segmented_image_path))
     # segmentation_metrics = calculate_segmentation_metrics(segmented_image_np)
 
+    # Check if a person is detected and perform emotion detection
+    # emotions = []
+    if 'person' in detected_classes:
+        emotions = detect_emotions(image_path)
+
     return render_template('results.html', filename=filename, action=action, color_space=color_space,
                            processed_image=processed_image_path, segmented_image=segmented_image_path,
                            converted_image=converted_image_path, transformed_image=transformed_image_path,
                            filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path,
                            equalized_image=equalized_image_path, enhanced_image=enhanced_image_path,
                            detected_classes=detected_classes, processed_image_person=processed_image_person_path,
-                           segmentation_metrics=segmentation_metrics)
+                           segmentation_metrics=segmentation_metrics, emotions=emotions)
 
 def process_image(image_path, action):
     image = Image.open(image_path)

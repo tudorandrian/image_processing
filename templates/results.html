@@ -33,6 +33,33 @@
         </div>
         {% endif %}
     </div>
+    {% if 'person' in detected_classes %}
+    <div>
+        <h2>Emotion Analysis Results</h2>
+        <table>
+            <tr>
+                <th>Dominant Emotion</th>
+                <th>Face Confidence</th>
+                <th>Emotions</th>
+                <th>Region</th>
+            </tr>
+            {% for result in emotions %}
+            <tr>
+                <td>{{ result['dominant_emotion'] }}</td>
+                <td>{{ result['face_confidence'] }}</td>
+                <td>
+                    <ul>
+                        {% for emotion, value in result['emotion'].items() %}
+                        <li>{{ emotion }}: {{ value }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>{{ result['region'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
     <div>
         <h2>Segmented Image</h2>
         <img src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Segmented Image">
