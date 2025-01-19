@@ -169,14 +169,21 @@
             {% endfor %}
         {% endif %}
     </div>
+    <!-- Enhanced Images Section -->
     <div>
         <h2>Enhanced Images</h2>
-        {% if enhanced_images|length > 1 %}
-            {% for image in enhanced_images %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Enhanced Image">
+        {% if result_option == 'all' %}
+            {% for enhancement_type, image in enhanced_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ enhancement_type }} Image">
+                <h3>{{ enhancement_type | capitalize }} Enhancement</h3>
+                <p>{{ enhancement_type_descriptions[enhancement_type] }}</p>
             {% endfor %}
         {% else %}
-            <img src="{{ url_for('uploaded_file', filename=enhanced_images[0]) }}" alt="Enhanced Image">
+            {% if enhancement_type in enhanced_images %}
+                <img src="{{ url_for('uploaded_file', filename=enhanced_images[enhancement_type]) }}" alt="{{ enhancement_type }} Image">
+                <h3>{{ enhancement_type | capitalize }} Enhancement</h3>
+                <p>{{ enhancement_type_descriptions[enhancement_type] }}</p>
+            {% endif %}
         {% endif %}
     </div>
 </body>

@@ -202,6 +202,21 @@ def results():
         if 'person' in detected_classes:
             emotions = detect_emotions(image_path)
 
+        # Ensure enhanced_image_paths has enough elements
+        enhanced_images = {}
+        enhancement_types = ['sharpen', 'denoise', 'brightness', 'contrast']
+        for i, et in enumerate(enhancement_types):
+            if i < len(enhanced_image_paths):
+                enhanced_images[et] = enhanced_image_paths[i]
+
+        # Dictionary of enhancement types with descriptions
+        enhancement_type_descriptions = {
+            'sharpen': 'Sharpens the image.',
+            'denoise': 'Reduces noise in the image.',
+            'brightness': 'Adjusts the brightness of the image.',
+            'contrast': 'Adjusts the contrast of the image.'
+        }
+
         return render_template('results.html', filename=filename, result_option=result_option,
                                model_name=model_name, processed_image=processed_image_path,
                                processed_image_person=processed_image_person_path, emotions=emotions,
@@ -212,7 +227,8 @@ def results():
                                filtered_images=filtered_images, filter_type_descriptions=filter_type_descriptions,
                                equalized_images=equalized_images,
                                equalization_type_descriptions=equalization_type_descriptions,
-                               enhanced_images=enhanced_image_paths,
+                               enhanced_images=enhanced_images,
+                               enhancement_type_descriptions=enhancement_type_descriptions,
                                detected_classes=detected_classes,
                                segmentation_metrics=segmentation_metrics,
                                edge_algorithm=edge_algorithm, edge_detected_images=edge_detected_images,
