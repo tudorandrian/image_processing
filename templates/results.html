@@ -20,6 +20,14 @@
         <img src="{{ url_for('uploaded_file', filename=processed_image) }}" alt="Processed Image">
     </div>
     <div>
+        <h2>Detected Objects</h2>
+        <ul>
+            {% for detected_class in detected_classes %}
+                <li>{{ detected_class }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
         <h2>Segmented Image</h2>
         <img src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Segmented Image">
     </div>

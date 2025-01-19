@@ -20,6 +20,19 @@ preprocess = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
+# List of COCO class names
+COCO_CLASSES = [
+    'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
+    'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+    'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+    'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
+    'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+    'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+    'potted plant', 'bed', 'dining table', 'toilet', 'TV', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
+    'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
+    'hair drier', 'toothbrush'
+]
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -92,7 +105,7 @@ def results():
     enhancement_value = request.args.get('enhancement_value', type=float)
     image_path = os.path.join("uploads", filename)
 
-    processed_image_path = process_image(image_path, action)
+    processed_image_path, detected_classes = process_image(image_path, action)
     segmented_image_path = segment_image(image_path, action)
     converted_image_path = convert_color_space(image_path, color_space)
     transformed_image_path = transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, crop_width, crop_height, flip_code)
@@ -105,15 +118,20 @@ def results():
                            processed_image=processed_image_path, segmented_image=segmented_image_path,
                            converted_image=converted_image_path, transformed_image=transformed_image_path,
                            filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path,
-                           equalized_image=equalized_image_path, enhanced_image=enhanced_image_path)
+                           equalized_image=equalized_image_path, enhanced_image=enhanced_image_path,
+                           detected_classes=detected_classes)
 
 def process_image(image_path, action):
     image = Image.open(image_path)
     results = object_detection_model(image_path)
     image_np = np.array(image)
+
+    # List to store detected class names
+    detected_classes = []
+
     for result in results.xyxy[0]:
         bbox = result[:4].tolist()
-        label = result[-1].item()
+        class_id = int(result[-1].item())
         confidence = result[-2].item()
         color = (0, 255, 0)
         thickness = 3
@@ -121,12 +139,15 @@ def process_image(image_path, action):
         font_scale = 0.5
         font_thickness = 1
         cv2.rectangle(image_np, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color, thickness)
-        label_text = f"{label}: {confidence:.2f}"
+        label_text = f"{COCO_CLASSES[class_id]}: {confidence:.2f}"
         cv2.putText(image_np, label_text, (int(bbox[0]), int(bbox[1]) - 10), font, font_scale, color, font_thickness)
+        detected_classes.append(COCO_CLASSES[class_id])
+
     processed_image_filename = f"processed_{os.path.basename(image_path)}"
     processed_image_path = os.path.join("uploads", processed_image_filename)
     Image.fromarray(image_np).save(processed_image_path)
-    return processed_image_filename
+
+    return processed_image_filename, list(set(detected_classes))
 
 def segment_image(image_path, action):
     image = Image.open(image_path)
