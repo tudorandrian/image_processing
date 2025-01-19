@@ -103,14 +103,26 @@
         <h2>Transformed Image</h2>
         <img src="{{ url_for('uploaded_file', filename=transformed_image) }}" alt="Transformed Image">
     </div>
+    <!-- Filtered Images Section -->
     <div>
         <h2>Filtered Images</h2>
-        {% if filtered_images|length > 1 %}
-            {% for image in filtered_images %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Filtered Image">
+        {% if result_option == 'all' %}
+            {% for filter_type, image in filtered_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ filter_type }} Image">
+                <h3>{{ filter_type | capitalize }} Filter</h3>
+                <p>{{ filter_type_descriptions[filter_type] }}</p>
             {% endfor %}
         {% else %}
-            <img src="{{ url_for('uploaded_file', filename=filtered_images[0]) }}" alt="Filtered Image">
+            {% if filter_type in filtered_images %}
+                <img src="{{ url_for('uploaded_file', filename=filtered_images[filter_type]) }}" alt="{{ filter_type }} Image">
+                <h3>{{ filter_type | capitalize }} Filter</h3>
+                <p>{{ filter_type_descriptions[filter_type] }}</p>
+            {% endif %}
+            {% for filter_type, image in filtered_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ filter_type }} Image">
+                <h3>{{ filter_type | capitalize }} Filter</h3>
+                <p>{{ filter_type_descriptions[filter_type] }}</p>
+            {% endfor %}
         {% endif %}
     </div>
     <!-- Edge-detected Images Section -->

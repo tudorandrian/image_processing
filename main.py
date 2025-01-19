@@ -154,6 +154,19 @@ def results():
             'GRAY': 'Grayscale color space.'
         }
 
+        # Ensure filtered_image_paths has enough elements
+        filtered_images = {}
+        filter_types = ['gaussian', 'median']
+        for i, ft in enumerate(filter_types):
+            if i < len(filtered_image_paths):
+                filtered_images[ft] = filtered_image_paths[i]
+
+        # Dictionary of filter types with descriptions
+        filter_type_descriptions = {
+            'gaussian': 'Gaussian Blur filter.',
+            'median': 'Median Blur filter.'
+        }
+
         # Ensure edge_detected_image_paths has enough elements
         edge_detected_images = {}
         algorithms = ['canny', 'sobel', 'scharr', 'roberts', 'log']
@@ -178,16 +191,14 @@ def results():
         return render_template('results.html', filename=filename, result_option=result_option,
                                model_name=model_name, processed_image=processed_image_path,
                                processed_image_person=processed_image_person_path, emotions=emotions,
-                               segmented_image=segmented_image_path,
+                               segmented_image=segmented_image_path, segmentation_metrics=segmentation_metrics,
                                color_space=color_space, converted_images=converted_images, color_space_descriptions=color_space_descriptions,
                                transformed_image=transformed_image_path,
-                               filtered_images=filtered_image_paths,
+                               filter_type_loc=filter_type, filtered_images=filtered_images, filter_type_descriptions=filter_type_descriptions,
                                equalized_images=equalized_image_paths,
                                enhanced_images=enhanced_image_paths,
                                detected_classes=detected_classes,
-                               segmentation_metrics=segmentation_metrics,
-                               edge_algorithm=edge_algorithm, edge_detected_images=edge_detected_images,
-                               edge_algorithm_descriptions=edge_algorithm_descriptions)
+                               edge_algorithm=edge_algorithm, edge_detected_images=edge_detected_images, edge_algorithm_descriptions=edge_algorithm_descriptions)
 
     except ValueError as e:
         flash(str(e))
