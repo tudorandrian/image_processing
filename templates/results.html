@@ -101,14 +101,26 @@
             <img src="{{ url_for('uploaded_file', filename=filtered_images[0]) }}" alt="Filtered Image">
         {% endif %}
     </div>
+    <!-- Edge-detected Images Section -->
     <div>
         <h2>Edge-detected Images</h2>
-        {% if edge_detected_images|length > 1 %}
-            {% for image in edge_detected_images %}
-                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Edge-detected Image">
+        {% if result_option == 'all' %}
+            {% for algorithm, image in edge_detected_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ algorithm }} Image">
+                <h3>{{ algorithm | capitalize }} Algorithm</h3>
+                <p>{{ edge_algorithm_descriptions[algorithm] }}</p>
             {% endfor %}
         {% else %}
-            <img src="{{ url_for('uploaded_file', filename=edge_detected_images[0]) }}" alt="Edge-detected Image">
+            {% if edge_algorithm in edge_detected_images %}
+                <img src="{{ url_for('uploaded_file', filename=edge_detected_images[edge_algorithm]) }}" alt="{{ edge_algorithm }} Image">
+                <h3>{{ edge_algorithm | capitalize }} Algorithm</h3>
+                <p>{{ edge_algorithm_descriptions[edge_algorithm] }}</p>
+            {% endif %}
+            {% for algorithm, image in edge_detected_images.items() %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ algorithm }} Image">
+                <h3>{{ algorithm | capitalize }} Algorithm</h3>
+                <p>{{ edge_algorithm_descriptions[algorithm] }}</p>
+            {% endfor %}
         {% endif %}
     </div>
     <div>
