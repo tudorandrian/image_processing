@@ -17,16 +17,13 @@
         <label for="image">Select image:</label>
         <input type="file" name="image" id="image" required>
         <br>
-        <!-- Dropdown menu for selecting an action -->
-        <label>
-            <select name="action" required>
-                <option value="humans">Check for Humans</option>
-                <option value="animals">Check for Animals</option>
-                <option value="fruits">Check for Fruits</option>
-                <option value="cars">Check for Cars</option>
-                <option value="trees">Check for Trees</option>
-            </select>
-        </label>
+        <br>
+        <!-- Add radio buttons for result selection -->
+        <label for="result_option">Select result option:</label>
+        <input type="radio" id="single_result" name="result_option" value="single" checked>
+        <label for="single_result">Single result per feature</label>
+        <input type="radio" id="all_results" name="result_option" value="all">
+        <label for="all_results">All results</label>
         <br>
         <br>
         <label for="color_space">Select color space:</label>

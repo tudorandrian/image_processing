@@ -2,7 +2,7 @@ import os
 import uuid
 import cv2
 import numpy as np
-from flask import Flask, request, jsonify, render_template, redirect, url_for, send_from_directory
+from flask import Flask, request, jsonify, render_template, redirect, url_for, send_from_directory, flash
 from PIL import Image, ImageEnhance
 import torch
 from torchvision import transforms
@@ -40,10 +40,10 @@ def home():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'image' not in request.files or 'action' not in request.form:
+    if 'image' not in request.files:
         return jsonify({"error": "No file part or action selected"})
     file = request.files['image']
-    action = request.form['action']
+    result_option = request.form['result_option']  # Capture the selected result option
     color_space = request.form['color_space']
     rotation_angle = request.form.get('rotation_angle', type=int, default=0)
     scale_factor = request.form.get('scale_factor', type=float, default=1.0)
@@ -74,7 +74,7 @@ def upload():
             image_path = os.path.join("uploads", filename)
         file.save(image_path)
 
-        return redirect(url_for('results', filename=filename, action=action, color_space=color_space,
+        return redirect(url_for('results', filename=filename, result_option=result_option, color_space=color_space,
                                 rotation_angle=rotation_angle, scale_factor=scale_factor,
                                 crop_x=crop_x, crop_y=crop_y, crop_width=crop_width, crop_height=crop_height,
                                 flip_code=flip_code, filter_type=filter_type, kernel_size=kernel_size,
@@ -96,70 +96,60 @@ def detect_emotions(image_path):
     # Analyze the image to detect emotions
     results = DeepFace.analyze(img_path=image_path, actions=['emotion'])
 
-    # print(results)
-    # print(type(results))
-
-    # Extract the emotion analysis results
-    # emotions = results['emotion']
-
     return results
 
 @app.route('/results')
 def results():
-    filename = request.args.get('filename')
-    action = request.args.get('action')
-    color_space = request.args.get('color_space')
-    rotation_angle = request.args.get('rotation_angle', type=int)
-    scale_factor = request.args.get('scale_factor', type=float)
-    crop_x = request.args.get('crop_x', type=int)
-    crop_y = request.args.get('crop_y', type=int)
-    crop_width = request.args.get('crop_width', type=int)
-    crop_height = request.args.get('crop_height', type=int)
-    flip_code = request.args.get('flip_code', type=int)
-    filter_type = request.args.get('filter_type')
-    kernel_size = request.args.get('kernel_size', type=int, default=7)
-    edge_algorithm = request.args.get('edge_algorithm')
-    threshold1 = request.args.get('threshold1', type=int)
-    threshold2 = request.args.get('threshold2', type=int)
-    equalization_type = request.args.get('equalization_type')
-    clip_limit = request.args.get('clip_limit', type=float)
-    tile_grid_size = request.args.get('tile_grid_size', type=int)
-    enhancement_type = request.args.get('enhancement_type')
-    enhancement_value = request.args.get('enhancement_value', type=float)
-    image_path = os.path.join("uploads", filename)
+    try:
+        filename = request.args.get('filename')
+        result_option = request.args.get('result_option')
+        color_space = request.args.get('color_space')
+        rotation_angle = request.args.get('rotation_angle', type=int)
+        scale_factor = request.args.get('scale_factor', type=float)
+        crop_x = request.args.get('crop_x', type=int)
+        crop_y = request.args.get('crop_y', type=int)
+        crop_width = request.args.get('crop_width', type=int)
+        crop_height = request.args.get('crop_height', type=int)
+        flip_code = request.args.get('flip_code', type=int)
+        filter_type = request.args.get('filter_type')
+        kernel_size = request.args.get('kernel_size', type=int, default=7)
+        edge_algorithm = request.args.get('edge_algorithm')
+        threshold1 = request.args.get('threshold1', type=int)
+        threshold2 = request.args.get('threshold2', type=int)
+        equalization_type = request.args.get('equalization_type')
+        clip_limit = request.args.get('clip_limit', type=float)
+        tile_grid_size = request.args.get('tile_grid_size', type=int)
+        enhancement_type = request.args.get('enhancement_type')
+        enhancement_value = request.args.get('enhancement_value', type=float)
+        image_path = os.path.join("uploads", filename)
 
-    processed_image_path, detected_classes, processed_image_person_path = process_image(image_path, action)
-    segmented_image_path, segmentation_metrics = segment_image(image_path, action)
+        processed_image_path, detected_classes, processed_image_person_path = process_image(image_path)
+        segmented_image_path, segmentation_metrics = segment_image(image_path)
 
+        converted_image_paths = convert_color_space(image_path, color_space, result_option)
+        transformed_image_path = transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, crop_width, crop_height, flip_code)
+        filtered_image_paths = apply_filter(image_path, filter_type, kernel_size, result_option)
+        edge_detected_image_paths = apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2, result_option)
+        equalized_image_paths = apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size, result_option)
+        enhanced_image_paths = apply_image_enhancement(image_path, enhancement_type, enhancement_value, result_option)
 
-    converted_image_path = convert_color_space(image_path, color_space)
-    transformed_image_path = transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, crop_width, crop_height, flip_code)
-    filtered_image_path = apply_filter(image_path, filter_type, kernel_size)
-    edge_detected_image_path = apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2)
-    equalized_image_path = apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size)
-    enhanced_image_path = apply_image_enhancement(image_path, enhancement_type, enhancement_value)
+        # Check if a person is detected and perform emotion detection
+        # emotions = []
+        if 'person' in detected_classes:
+            emotions = detect_emotions(image_path)
 
-    # Check if the segmented image file exists
-    # if not os.path.exists(segmented_image_path):
-    #     raise FileNotFoundError(f"Segmented image file not found: {segmented_image_path}")
-    #
-    # segmented_image_np = np.array(Image.open(segmented_image_path))
-    # segmentation_metrics = calculate_segmentation_metrics(segmented_image_np)
+        return render_template('results.html', filename=filename, color_space=color_space,
+                               processed_image=processed_image_path, segmented_image=segmented_image_path,
+                               converted_images=converted_image_paths, transformed_image=transformed_image_path,
+                               filtered_images=filtered_image_paths, edge_detected_images=edge_detected_image_paths,
+                               equalized_images=equalized_image_paths, enhanced_images=enhanced_image_paths,
+                               detected_classes=detected_classes, processed_image_person=processed_image_person_path,
+                               segmentation_metrics=segmentation_metrics, emotions=emotions)
+    except ValueError as e:
+        flash(str(e))
+        return redirect(url_for('index'))
 
-    # Check if a person is detected and perform emotion detection
-    # emotions = []
-    if 'person' in detected_classes:
-        emotions = detect_emotions(image_path)
-
-    return render_template('results.html', filename=filename, action=action, color_space=color_space,
-                           processed_image=processed_image_path, segmented_image=segmented_image_path,
-                           converted_image=converted_image_path, transformed_image=transformed_image_path,
-                           filtered_image=filtered_image_path, edge_detected_image=edge_detected_image_path,
-                           equalized_image=equalized_image_path, enhanced_image=enhanced_image_path,
-                           detected_classes=detected_classes, processed_image_person=processed_image_person_path,
-                           segmentation_metrics=segmentation_metrics, emotions=emotions)
-
-def process_image(image_path, action):
+def process_image(image_path):
     image = Image.open(image_path)
     results = object_detection_model(image_path)
     image_np = np.array(image)
@@ -207,7 +197,7 @@ def process_image(image_path, action):
 
     return processed_image_filename, list(set(detected_classes)), processed_image_person_filename
 
-def segment_image(image_path, action):
+def segment_image(image_path):
     image = Image.open(image_path)
     image_tensor = preprocess(image).unsqueeze(0)
     with torch.no_grad():
@@ -247,21 +237,40 @@ def segment_image(image_path, action):
 
     return segmented_image_filename, segmentation_metrics
 
-def convert_color_space(image_path, color_space):
+def convert_color_space(image_path, color_space, result_option):
     image = cv2.imread(image_path)
-    if color_space == 'HSV':
-        converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    elif color_space == 'LAB':
-        converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-    elif color_space == 'GRAY':
-        converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    results = []
+
+    if result_option == 'all':
+        # Return all color space conversions
+        color_spaces = ['HSV', 'LAB', 'GRAY']
+        for cs in color_spaces:
+            if cs == 'HSV':
+                converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+            elif cs == 'LAB':
+                converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+            elif cs == 'GRAY':
+                converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            converted_image_filename = f"converted_{cs}_{os.path.basename(image_path)}"
+            converted_image_path = os.path.join("uploads", converted_image_filename)
+            cv2.imwrite(converted_image_path, converted_image)
+            results.append(converted_image_filename)
     else:
-        converted_image = image
-    converted_image_filename = f"converted_{os.path.basename(image_path)}"
-    converted_image_path = os.path.join("uploads", converted_image_filename)
-    cv2.imwrite(converted_image_path, converted_image)
-    print(f"Converted image saved at: {converted_image_path} with color space: {color_space}")
-    return converted_image_filename
+        # Return single color space conversion
+        if color_space == 'HSV':
+            converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        elif color_space == 'LAB':
+            converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+        elif color_space == 'GRAY':
+            converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        else:
+            converted_image = image
+        converted_image_filename = f"converted_{os.path.basename(image_path)}"
+        converted_image_path = os.path.join("uploads", converted_image_filename)
+        cv2.imwrite(converted_image_path, converted_image)
+        results.append(converted_image_filename)
+
+    return results
 
 def transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, crop_width, crop_height, flip_code):
     image = cv2.imread(image_path)
@@ -282,103 +291,160 @@ def transform_image(image_path, rotation_angle, scale_factor, crop_x, crop_y, cr
     print(f"Transformed image saved at: {transformed_image_path}")
     return transformed_image_filename
 
-def apply_filter(image_path, filter_type, kernel_size):
-    # Read the image using OpenCV
+def apply_filter(image_path, filter_type, kernel_size, result_option):
     image = cv2.imread(image_path)
+    results = []
 
-
-    # Ensure kernel size is odd and greater than 1
-    if kernel_size % 2 == 0 or kernel_size <= 1:
-        raise ValueError("Kernel size must be an odd number and greater than 1")
-
-    # Apply the selected filter
-    if filter_type == 'gaussian':
-        filtered_image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
-    elif filter_type == 'median':
-        filtered_image = cv2.medianBlur(image, kernel_size)
+    if result_option == 'all':
+        # Return all filter types
+        filter_types = ['gaussian', 'median']
+        for ft in filter_types:
+            if ft == 'gaussian':
+                filtered_image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+            elif ft == 'median':
+                filtered_image = cv2.medianBlur(image, kernel_size)
+            filtered_image_filename = f"filtered_{ft}_{os.path.basename(image_path)}"
+            filtered_image_path = os.path.join("uploads", filtered_image_filename)
+            cv2.imwrite(filtered_image_path, filtered_image)
+            results.append(filtered_image_filename)
     else:
-        filtered_image = image
+        # Return single filter type
+        if filter_type == 'gaussian':
+            filtered_image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+        elif filter_type == 'median':
+            filtered_image = cv2.medianBlur(image, kernel_size)
+        else:
+            filtered_image = image
+        filtered_image_filename = f"filtered_{os.path.basename(image_path)}"
+        filtered_image_path = os.path.join("uploads", filtered_image_filename)
+        cv2.imwrite(filtered_image_path, filtered_image)
+        results.append(filtered_image_filename)
 
-    # Save the filtered image
-    filtered_image_filename = f"filtered_{os.path.basename(image_path)}"
-    filtered_image_path = os.path.join("uploads", filtered_image_filename)
-    cv2.imwrite(filtered_image_path, filtered_image)
+    return results
 
-    return filtered_image_filename
-
-def apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2):
-    # Read the image using OpenCV
+def apply_edge_detection(image_path, edge_algorithm, threshold1, threshold2, result_option):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    results = []
 
-    # Apply the selected edge detection algorithm
-    if edge_algorithm == 'canny':
-        edges = cv2.Canny(image, threshold1, threshold2)
-    elif edge_algorithm == 'sobel':
-        edges = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
-    elif edge_algorithm == 'scharr':
-        edges = cv2.Scharr(image, cv2.CV_64F, 1, 0)
-    elif edge_algorithm == 'roberts':
-        kernel = np.array([[1, 0], [0, -1]], dtype=np.float32)
-        edges = cv2.filter2D(image, -1, kernel)
-    elif edge_algorithm == 'log':
-        edges = cv2.Laplacian(image, cv2.CV_64F)
+    if result_option == 'all':
+        # Return all edge detection algorithms
+        edge_algorithms = ['canny', 'sobel', 'scharr', 'roberts', 'log']
+        for ea in edge_algorithms:
+            if ea == 'canny':
+                edges = cv2.Canny(image, threshold1, threshold2)
+            elif ea == 'sobel':
+                edges = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
+            elif ea == 'scharr':
+                edges = cv2.Scharr(image, cv2.CV_64F, 1, 0)
+            elif ea == 'roberts':
+                kernel = np.array([[1, 0], [0, -1]], dtype=np.float32)
+                edges = cv2.filter2D(image, -1, kernel)
+            elif ea == 'log':
+                edges = cv2.Laplacian(image, cv2.CV_64F)
+            edge_detected_image_filename = f"edge_detected_{ea}_{os.path.basename(image_path)}"
+            edge_detected_image_path = os.path.join("uploads", edge_detected_image_filename)
+            cv2.imwrite(edge_detected_image_path, edges)
+            results.append(edge_detected_image_filename)
     else:
-        edges = image
+        # Return single edge detection algorithm
+        if edge_algorithm == 'canny':
+            edges = cv2.Canny(image, threshold1, threshold2)
+        elif edge_algorithm == 'sobel':
+            edges = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
+        elif edge_algorithm == 'scharr':
+            edges = cv2.Scharr(image, cv2.CV_64F, 1, 0)
+        elif edge_algorithm == 'roberts':
+            kernel = np.array([[1, 0], [0, -1]], dtype=np.float32)
+            edges = cv2.filter2D(image, -1, kernel)
+        elif edge_algorithm == 'log':
+            edges = cv2.Laplacian(image, cv2.CV_64F)
+        else:
+            edges = image
+        edge_detected_image_filename = f"edge_detected_{os.path.basename(image_path)}"
+        edge_detected_image_path = os.path.join("uploads", edge_detected_image_filename)
+        cv2.imwrite(edge_detected_image_path, edges)
+        results.append(edge_detected_image_filename)
 
-    # Save the edge-detected image
-    edge_detected_image_filename = f"edge_detected_{os.path.basename(image_path)}"
-    edge_detected_image_path = os.path.join("uploads", edge_detected_image_filename)
-    cv2.imwrite(edge_detected_image_path, edges)
+    return results
 
-    return edge_detected_image_filename
-
-def apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size):
-    # Read the image using OpenCV
+def apply_histogram_equalization(image_path, equalization_type, clip_limit, tile_grid_size, result_option):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    results = []
 
-    # Apply the selected histogram equalization method
-    if equalization_type == 'ahe':
-        equalized_image = cv2.equalizeHist(image)
-    elif equalization_type == 'clahe':
-        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_grid_size, tile_grid_size))
-        equalized_image = clahe.apply(image)
+    if result_option == 'all':
+        # Return all equalization types
+        equalization_types = ['ahe', 'clahe']
+        for et in equalization_types:
+            if et == 'ahe':
+                equalized_image = cv2.equalizeHist(image)
+            elif et == 'clahe':
+                clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_grid_size, tile_grid_size))
+                equalized_image = clahe.apply(image)
+            equalized_image_filename = f"equalized_{et}_{os.path.basename(image_path)}"
+            equalized_image_path = os.path.join("uploads", equalized_image_filename)
+            cv2.imwrite(equalized_image_path, equalized_image)
+            results.append(equalized_image_filename)
     else:
-        equalized_image = image
+        # Return single equalization type
+        if equalization_type == 'ahe':
+            equalized_image = cv2.equalizeHist(image)
+        elif equalization_type == 'clahe':
+            clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_grid_size, tile_grid_size))
+            equalized_image = clahe.apply(image)
+        else:
+            equalized_image = image
+        equalized_image_filename = f"equalized_{os.path.basename(image_path)}"
+        equalized_image_path = os.path.join("uploads", equalized_image_filename)
+        cv2.imwrite(equalized_image_path, equalized_image)
+        results.append(equalized_image_filename)
 
-    # Save the equalized image
-    equalized_image_filename = f"equalized_{os.path.basename(image_path)}"
-    equalized_image_path = os.path.join("uploads", equalized_image_filename)
-    cv2.imwrite(equalized_image_path, equalized_image)
+    return results
 
-    return equalized_image_filename
-
-def apply_image_enhancement(image_path, enhancement_type, enhancement_value):
-    # Read the image using PIL
+def apply_image_enhancement(image_path, enhancement_type, enhancement_value, result_option):
     image = Image.open(image_path)
+    results = []
 
-    # Apply the selected enhancement method
-    if enhancement_type == 'sharpen':
-        enhancer = ImageEnhance.Sharpness(image)
-    elif enhancement_type == 'denoise':
-        enhancer = ImageEnhance.Sharpness(image)  # Placeholder, use actual denoising method
-    elif enhancement_type == 'brightness':
-        enhancer = ImageEnhance.Brightness(image)
-    elif enhancement_type == 'contrast':
-        enhancer = ImageEnhance.Contrast(image)
+    if result_option == 'all':
+        # Return all enhancement types
+        enhancement_types = ['sharpen', 'denoise', 'brightness', 'contrast']
+        for et in enhancement_types:
+            if et == 'sharpen':
+                enhancer = ImageEnhance.Sharpness(image)
+            elif et == 'denoise':
+                enhancer = ImageEnhance.Sharpness(image)  # Placeholder, use actual denoising method
+            elif et == 'brightness':
+                enhancer = ImageEnhance.Brightness(image)
+            elif et == 'contrast':
+                enhancer = ImageEnhance.Contrast(image)
+            enhanced_image = enhancer.enhance(enhancement_value)
+            enhanced_image_filename = f"enhanced_{et}_{os.path.basename(image_path)}"
+            enhanced_image_path = os.path.join("uploads", enhanced_image_filename)
+            enhanced_image.save(enhanced_image_path)
+            results.append(enhanced_image_filename)
     else:
-        enhancer = None
+        # Return single enhancement type
+        if enhancement_type == 'sharpen':
+            enhancer = ImageEnhance.Sharpness(image)
+        elif enhancement_type == 'denoise':
+            enhancer = ImageEnhance.Sharpness(image)  # Placeholder, use actual denoising method
+        elif enhancement_type == 'brightness':
+            enhancer = ImageEnhance.Brightness(image)
+        elif enhancement_type == 'contrast':
+            enhancer = ImageEnhance.Contrast(image)
+        else:
+            enhancer = None
 
-    if enhancer:
-        enhanced_image = enhancer.enhance(enhancement_value)
-    else:
-        enhanced_image = image
+        if enhancer:
+            enhanced_image = enhancer.enhance(enhancement_value)
+        else:
+            enhanced_image = image
 
-    # Save the enhanced image
-    enhanced_image_filename = f"enhanced_{os.path.basename(image_path)}"
-    enhanced_image_path = os.path.join("uploads", enhanced_image_filename)
-    enhanced_image.save(enhanced_image_path)
+        enhanced_image_filename = f"enhanced_{os.path.basename(image_path)}"
+        enhanced_image_path = os.path.join("uploads", enhanced_image_filename)
+        enhanced_image.save(enhanced_image_path)
+        results.append(enhanced_image_filename)
 
-    return enhanced_image_filename
+    return results
 
 # Function to calculate segmentation metrics
 def calculate_segmentation_metrics(segmented_image_np):

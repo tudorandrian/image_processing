@@ -8,11 +8,7 @@
 <body>
     <h1>Image Processing Results</h1>
     <div>
-        <h2>Action: {{ action }}</h2>
-        <!-- Placeholder for additional results -->
-    </div>
-    <div>
-        <h2>Uploaded Image</h2>
+        <h2>Uploaded/Original Image</h2>
         <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
     </div>
     <div>
@@ -79,28 +75,58 @@
         <!-- Placeholder for additional results -->
     </div>
     <div>
-        <h2>Converted Image</h2>
-        <img src="{{ url_for('uploaded_file', filename=converted_image) }}" alt="Converted Image">
+        <h2>Converted Images</h2>
+        {% if converted_images|length > 1 %}
+            {% for image in converted_images %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Converted Image">
+            {% endfor %}
+        {% else %}
+            <img src="{{ url_for('uploaded_file', filename=converted_images[0]) }}" alt="Converted Image">
+        {% endif %}
     </div>
     <div>
         <h2>Transformed Image</h2>
         <img src="{{ url_for('uploaded_file', filename=transformed_image) }}" alt="Transformed Image">
     </div>
     <div>
-        <h2>Filtered Image</h2>
-        <img src="{{ url_for('uploaded_file', filename=filtered_image) }}" alt="Filtered Image">
+        <h2>Filtered Images</h2>
+        {% if filtered_images|length > 1 %}
+            {% for image in filtered_images %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Filtered Image">
+            {% endfor %}
+        {% else %}
+            <img src="{{ url_for('uploaded_file', filename=filtered_images[0]) }}" alt="Filtered Image">
+        {% endif %}
     </div>
     <div>
-        <h2>The edge-detected Image</h2>
-        <img src="{{ url_for('uploaded_file', filename=edge_detected_image) }}" alt="The edge-detected Image">
+        <h2>Edge-detected Images</h2>
+        {% if edge_detected_images|length > 1 %}
+            {% for image in edge_detected_images %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Edge-detected Image">
+            {% endfor %}
+        {% else %}
+            <img src="{{ url_for('uploaded_file', filename=edge_detected_images[0]) }}" alt="Edge-detected Image">
+        {% endif %}
     </div>
     <div>
-        <h2>Equalized Image</h2>
-        <img src="{{ url_for('uploaded_file', filename=equalized_image) }}" alt="Equalized Image">
+        <h2>Equalized Images</h2>
+        {% if equalized_images|length > 1 %}
+            {% for image in equalized_images %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Equalized Image">
+            {% endfor %}
+        {% else %}
+            <img src="{{ url_for('uploaded_file', filename=equalized_images[0]) }}" alt="Equalized Image">
+        {% endif %}
     </div>
     <div>
-        <h2>Image Enhancement</h2>
-        <img src="{{ url_for('uploaded_file', filename=enhanced_image) }}" alt="Image Enhancement">
+        <h2>Enhanced Images</h2>
+        {% if enhanced_images|length > 1 %}
+            {% for image in enhanced_images %}
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Enhanced Image">
+            {% endfor %}
+        {% else %}
+            <img src="{{ url_for('uploaded_file', filename=enhanced_images[0]) }}" alt="Enhanced Image">
+        {% endif %}
     </div>
 </body>
 </html>
