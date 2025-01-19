@@ -107,3 +107,8 @@ Werkzeug @ file:///C:/b/abs_b21bhstb1q/croot/werkzeug_1731005800632/work
 win-inet-pton @ file:///C:/ci/win_inet_pton_1605306162074/work
 wrapt==1.17.2
 zipp @ file:///C:/b/abs_2fcpcg89my/croot/zipp_1732630746332/work
+
+numpy~=1.26.4
+flask~=3.1.0
+pillow~=11.0.0
+torchvision~=0.18.1
