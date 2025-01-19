@@ -8,6 +8,9 @@
 <body>
     <h1>Image Processing Results</h1>
     <div>
+        <h2>Selected model name: {{ model_name }}</h2>
+    </div>
+    <div>
         <h2>Uploaded/Original Image</h2>
         <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
     </div>
@@ -65,7 +68,7 @@
         <h2>Segmentation Metrics</h2>
         <ul>
             <li>Number of Segments: {{ segmentation_metrics.num_segments }}</li>
-            {% for segment in segmentation_metrics.segments %}
+            {% for segment in segmentation_metrics.segments[:10] %}
                 <li>Segment ID: {{ segment.segment_id }}, Area: {{ segment.area }}, Percentage: {{ segment.percentage }}%</li>
             {% endfor %}
         </ul>

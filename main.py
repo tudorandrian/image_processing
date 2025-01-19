@@ -151,7 +151,7 @@ def results():
                                filtered_images=filtered_image_paths, edge_detected_images=edge_detected_image_paths,
                                equalized_images=equalized_image_paths, enhanced_images=enhanced_image_paths,
                                detected_classes=detected_classes, processed_image_person=processed_image_person_path,
-                               segmentation_metrics=segmentation_metrics, emotions=emotions)
+                               segmentation_metrics=segmentation_metrics, emotions=emotions, model_name=model_name)
     except ValueError as e:
         flash(str(e))
         return redirect(url_for('index'))
