@@ -37,6 +37,10 @@ COCO_CLASSES = [
 def home():
     return render_template('index.html')
 
+@app.route('/docs')
+def docs():
+    return render_template('docs.html')
+
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'image' not in request.files:
@@ -147,25 +151,31 @@ def results():
 
         # Ensure converted_image_paths has enough elements
         converted_images = {}
-        color_spaces = ['RGB', 'HSV', 'LAB', 'GRAY']
-        for i, cs in enumerate(color_spaces):
-            if i < len(converted_image_paths):
-                converted_images[cs] = converted_image_paths[i]
+        color_spaces = ['HSV', 'LAB', 'GRAY', 'RGB']
+        if len(converted_image_paths) == 1:
+            converted_images[color_space] = converted_image_paths[0]
+        else:
+            for i, cs in enumerate(color_spaces):
+                if i < len(converted_image_paths):
+                    converted_images[cs] = converted_image_paths[i]
 
         # Dictionary of color spaces with descriptions
         color_space_descriptions = {
-            'RGB': 'RGB color space.',
             'HSV': 'Hue, Saturation, and Value color space.',
             'LAB': 'CIE L*a*b* color space.',
-            'GRAY': 'Grayscale color space.'
+            'GRAY': 'Grayscale color space.',
+            'RGB': 'RGB color space.',
         }
 
         # Ensure filtered_image_paths has enough elements
         filtered_images = {}
         filter_types = ['gaussian', 'median']
-        for i, ft in enumerate(filter_types):
-            if i < len(filtered_image_paths):
-                filtered_images[ft] = filtered_image_paths[i]
+        if len(filtered_image_paths) == 1:
+            filtered_images[filter_type] = filtered_image_paths[0]
+        else:
+            for i, ft in enumerate(filter_types):
+                if i < len(filtered_image_paths):
+                    filtered_images[ft] = filtered_image_paths[i]
 
         # Dictionary of filter types with descriptions
         filter_type_descriptions = {
@@ -176,9 +186,12 @@ def results():
         # Ensure edge_detected_image_paths has enough elements
         edge_detected_images = {}
         algorithms = ['canny', 'sobel', 'scharr', 'roberts', 'log']
-        for i, algorithm in enumerate(algorithms):
-            if i < len(edge_detected_image_paths):
-                edge_detected_images[algorithm] = edge_detected_image_paths[i]
+        if len(edge_detected_image_paths) == 1:
+            edge_detected_images[edge_algorithm] = edge_detected_image_paths[0]
+        else:
+            for i, algorithm in enumerate(algorithms):
+                if i < len(edge_detected_image_paths):
+                    edge_detected_images[algorithm] = edge_detected_image_paths[i]
 
         # Dictionary of edge detection algorithms with descriptions
         edge_algorithm_descriptions = {
@@ -192,9 +205,12 @@ def results():
         # Ensure equalized_image_paths has enough elements
         equalized_images = {}
         equalization_types = ['ahe', 'clahe']
-        for i, et in enumerate(equalization_types):
-            if i < len(equalized_image_paths):
-                equalized_images[et] = equalized_image_paths[i]
+        if len(equalized_image_paths) == 1:
+            equalized_images[equalization_type] = equalized_image_paths[0]
+        else:
+            for i, et in enumerate(equalization_types):
+                if i < len(equalized_image_paths):
+                    equalized_images[et] = equalized_image_paths[i]
 
         # Dictionary of equalization types with descriptions
         equalization_type_descriptions = {
@@ -210,9 +226,12 @@ def results():
         # Ensure enhanced_image_paths has enough elements
         enhanced_images = {}
         enhancement_types = ['sharpen', 'denoise', 'brightness', 'contrast']
-        for i, et in enumerate(enhancement_types):
-            if i < len(enhanced_image_paths):
-                enhanced_images[et] = enhanced_image_paths[i]
+        if len(enhanced_image_paths) == 1:
+            enhanced_images[enhancement_type] = enhanced_image_paths[0]
+        else:
+            for i, et in enumerate(enhancement_types):
+                if i < len(enhanced_image_paths):
+                    enhanced_images[et] = enhanced_image_paths[i]
 
         # Dictionary of enhancement types with descriptions
         enhancement_type_descriptions = {
@@ -229,10 +248,11 @@ def results():
                                color_space=color_space, converted_images=converted_images,
                                color_space_descriptions=color_space_descriptions,
                                transformed_image=transformed_image_path,
-                               filtered_images=filtered_images, filter_type_descriptions=filter_type_descriptions,
-                               equalized_images=equalized_images,
+                               filter_type=filter_type, filtered_images=filtered_images,
+                               filter_type_descriptions=filter_type_descriptions,
+                               equalization_type=equalization_type, equalized_images=equalized_images,
                                equalization_type_descriptions=equalization_type_descriptions,
-                               enhanced_images=enhanced_images,
+                               enhancement_type=enhancement_type, enhanced_images=enhanced_images,
                                enhancement_type_descriptions=enhancement_type_descriptions,
                                detected_classes=detected_classes,
                                segmentation_metrics=segmentation_metrics,
@@ -337,16 +357,17 @@ def convert_color_space(image_path, color_space, result_option):
 
     if result_option == 'all':
         # Return all color space conversions
-        color_spaces = ['RGB', 'HSV', 'LAB', 'GRAY']
+        color_spaces = ['HSV', 'LAB', 'GRAY', 'RGB']
         for cs in color_spaces:
             if cs == 'HSV':
                 converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-            elif cs == 'RGB':
-                converted_image = image
             elif cs == 'LAB':
                 converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
             elif cs == 'GRAY':
                 converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            else:
+                converted_image = image
+
             converted_image_filename = f"converted_{cs}_{os.path.basename(image_path)}"
             converted_image_path = os.path.join("uploads", converted_image_filename)
             cv2.imwrite(converted_image_path, converted_image)
@@ -361,6 +382,7 @@ def convert_color_space(image_path, color_space, result_option):
             converted_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         else:
             converted_image = image
+
         converted_image_filename = f"converted_{os.path.basename(image_path)}"
         converted_image_path = os.path.join("uploads", converted_image_filename)
         cv2.imwrite(converted_image_path, converted_image)
