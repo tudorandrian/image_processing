@@ -190,10 +190,10 @@ def results():
 
         # Dictionary of color spaces with descriptions
         color_space_descriptions = {
-            'HSV': 'Hue, Saturation, and Value (HSV) color space represents colors in terms of their shade (hue), intensity (saturation), and brightness (value). It is often used in image processing for color-based segmentation and filtering.',
-            'LAB': 'CIE L*a*b* (LAB) color space is a color-opponent space with dimension L for lightness and a and b for the color-opponent dimensions. It is designed to approximate human vision and is used for color comparison and conversion.',
-            'GRAY': 'Grayscale color space represents images in shades of gray, with each pixel corresponding to an intensity value. It is commonly used in image processing tasks where color information is not necessary, such as edge detection and thresholding.',
-            'RGB': 'RGB color space represents images using the three primary colors: Red, Green, and Blue. Each color is represented by a combination of these three colors, and it is widely used in digital imaging and display technologies.'
+            'HSV': 'Spațiul de culoare Hue, Saturation, and Value (HSV) reprezintă culorile în termeni de nuanță (hue), intensitate (saturation) și luminozitate (value). Este adesea folosit în procesarea imaginilor pentru segmentarea și filtrarea bazată pe culoare.',
+            'LAB': 'Spațiul de culoare CIE L*a*b* (LAB) este un spațiu de culoare-oponent cu dimensiunea L pentru luminozitate și a și b pentru dimensiunile culoare-oponent. Este conceput pentru a aproxima vederea umană și este folosit pentru comparația și conversia culorilor.',
+            'GRAY': 'Spațiul de culoare Grayscale reprezintă imaginile în nuanțe de gri, fiecare pixel corespunzând unei valori de intensitate. Este utilizat frecvent în sarcinile de procesare a imaginilor unde informațiile de culoare nu sunt necesare, cum ar fi detectarea marginilor și binarizarea.',
+            'RGB': 'Spațiul de culoare RGB reprezintă imaginile folosind cele trei culori primare: Roșu, Verde și Albastru. Fiecare culoare este reprezentată printr-o combinație a acestor trei culori și este utilizat pe scară largă în tehnologiile de imagistică digitală și afișare.'
         }
 
         # Ensure filtered_image_paths has enough elements
@@ -208,8 +208,8 @@ def results():
 
         # Dictionary of filter types with descriptions
         filter_type_descriptions = {
-            'gaussian': 'Gaussian Blur filter applies a Gaussian function to the image, smoothing it by reducing noise and detail. It is useful for reducing image noise and detail, often used in preprocessing steps to enhance the performance of other algorithms.',
-            'median': 'Median Blur filter replaces each pixel\'s value with the median value of the neighboring pixels. This filter is effective in removing salt-and-pepper noise while preserving edges, making it suitable for images with high levels of noise.'
+            'gaussian': 'Filtrul Gaussian Blur aplică o funcție Gaussiană imaginii, netezind-o prin reducerea zgomotului și a detaliilor. Este util pentru reducerea zgomotului și a detaliilor imaginii, fiind adesea folosit în pașii de preprocesare pentru a îmbunătăți performanța altor algoritmi.',
+            'median': 'Filtrul Median Blur înlocuiește valoarea fiecărui pixel cu valoarea mediană a pixelilor vecini. Acest filtru este eficient în eliminarea zgomotului de tip sare și piper, păstrând în același timp marginile, fiind potrivit pentru imagini cu niveluri ridicate de zgomot.'
         }
 
         # Ensure edge_detected_image_paths has enough elements
@@ -224,11 +224,11 @@ def results():
 
         # Dictionary of edge detection algorithms with descriptions
         edge_algorithm_descriptions = {
-            'canny': 'Canny edge detection algorithm uses a multi-stage process to detect a wide range of edges in images. It involves noise reduction, gradient calculation, non-maximum suppression, and edge tracking by hysteresis.',
-            'sobel': 'Sobel edge detection algorithm calculates the gradient of the image intensity at each pixel, emphasizing regions of high spatial frequency that correspond to edges. It uses convolution with Sobel kernels to approximate the derivatives.',
-            'scharr': 'Scharr edge detection algorithm is a variation of the Sobel operator that provides a better approximation of the gradient magnitude, especially for diagonal edges. It uses specific convolution kernels to achieve this.',
-            'roberts': 'Roberts edge detection algorithm performs a simple, quick computation of the gradient magnitude using a pair of 2x2 convolution kernels. It is particularly sensitive to high-frequency noise and is best suited for detecting edges in images with sharp transitions.',
-            'log': 'Laplacian of Gaussian (LoG) edge detection algorithm combines Gaussian smoothing with the Laplacian operator to detect edges. It first smooths the image to reduce noise and then applies the Laplacian to highlight regions of rapid intensity change.'
+            'canny': 'Algoritmul de detectare a marginilor Canny folosește un proces în mai multe etape pentru a detecta o gamă largă de margini în imagini. Implică reducerea zgomotului, calculul gradientului, suprimarea non-maximelor și urmărirea marginilor prin histerezis.',
+            'sobel': 'Algoritmul de detectare a marginilor Sobel calculează gradientul intensității imaginii la fiecare pixel, subliniind regiunile cu frecvență spațială ridicată care corespund marginilor. Folosește convoluția cu kerneluri Sobel pentru a aproxima derivatele.',
+            'scharr': 'Algoritmul de detectare a marginilor Scharr este o variație a operatorului Sobel care oferă o mai bună aproximare a magnitudinii gradientului, în special pentru marginile diagonale. Folosește kerneluri de convoluție specifice pentru a realiza acest lucru.',
+            'roberts': 'Algoritmul de detectare a marginilor Roberts efectuează un calcul simplu și rapid al magnitudinii gradientului folosind o pereche de kerneluri de convoluție 2x2. Este deosebit de sensibil la zgomotul de înaltă frecvență și este cel mai potrivit pentru detectarea marginilor în imagini cu tranziții abrupte.',
+            'log': 'Algoritmul de detectare a marginilor Laplacian of Gaussian (LoG) combină netezirea Gaussiană cu operatorul Laplacian pentru a detecta marginile. Mai întâi netezește imaginea pentru a reduce zgomotul și apoi aplică operatorul Laplacian pentru a evidenția regiunile cu schimbări rapide de intensitate.'
         }
 
         # Ensure equalized_image_paths has enough elements
@@ -243,8 +243,8 @@ def results():
 
         # Dictionary of equalization types with descriptions
         equalization_type_descriptions = {
-            'ahe': 'Adaptive Histogram Equalization (AHE) improves the contrast of an image by transforming the values in the intensity histogram. It works by dividing the image into small regions and applying histogram equalization to each region independently, which enhances local contrast and brings out more details in the image.',
-            'clahe': 'Contrast Limited Adaptive Histogram Equalization (CLAHE) is a variant of AHE that prevents over-amplification of noise by limiting the contrast enhancement. It divides the image into small regions and applies histogram equalization to each region, but with a clip limit to control the maximum contrast. This results in a more balanced enhancement, reducing noise while improving the visibility of details.'
+            'ahe': 'Egalizarea Adaptive Histogram (AHE) îmbunătățește contrastul unei imagini prin transformarea valorilor din histograma de intensitate. Funcționează prin împărțirea imaginii în regiuni mici și aplicarea egalizării histogramelor fiecărei regiuni în mod independent, ceea ce îmbunătățește contrastul local și scoate în evidență mai multe detalii în imagine.',
+            'clahe': 'Egalizarea Adaptive Histogram Limitată de Contrast (CLAHE) este o variantă a AHE care previne amplificarea excesivă a zgomotului prin limitarea îmbunătățirii contrastului. Împarte imaginea în regiuni mici și aplică egalizarea histogramelor fiecărei regiuni, dar cu o limită de tăiere pentru a controla contrastul maxim. Acest lucru duce la o îmbunătățire mai echilibrată, reducând zgomotul și îmbunătățind vizibilitatea detaliilor.'
         }
 
         # Check if a person is detected and perform emotion detection
@@ -264,10 +264,10 @@ def results():
 
         # Dictionary of enhancement types with descriptions
         enhancement_type_descriptions = {
-            'sharpen': 'Sharpens the image by enhancing the edges and fine details, making the image appear clearer and more defined.',
-            'denoise': 'Reduces noise in the image, which can be caused by low light conditions or high ISO settings, resulting in a smoother and cleaner image.',
-            'brightness': 'Adjusts the brightness of the image, making it lighter or darker. This can help improve visibility in underexposed or overexposed areas.',
-            'contrast': 'Adjusts the contrast of the image, enhancing the difference between the light and dark areas. This can make the image appear more vivid and dynamic.'
+            'sharpen': 'Ascuțește imaginea prin îmbunătățirea marginilor și a detaliilor fine, făcând imaginea să pară mai clară și mai definită.',
+            'denoise': 'Reduce zgomotul din imagine, care poate fi cauzat de condiții de lumină scăzută sau setări ISO ridicate, rezultând o imagine mai netedă și mai curată.',
+            'brightness': 'Ajustează luminozitatea imaginii, făcând-o mai luminoasă sau mai întunecată. Acest lucru poate ajuta la îmbunătățirea vizibilității în zonele subexpuse sau supraexpuse.',
+            'contrast': 'Ajustează contrastul imaginii, îmbunătățind diferența dintre zonele luminoase și cele întunecate. Acest lucru poate face ca imaginea să pară mai vie și mai dinamică.'
         }
 
         # Render the results template with the processed images and descriptions
