@@ -33,63 +33,61 @@
 <div class="container my-5">
 	<div class="row p-4 pb-0 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
 		<div class="col-lg-7 p-3 p-lg-5 pt-lg-3">
-			<h1 class="display-4 fw-bold lh-1 text-body-emphasis">Welcome to the Image Processing Platform</h1>
-			<p class="lead">Quickly design and customize responsive mobile-first sites with Bootstrap, the world’s most
-				popular front-end open source toolkit, featuring Sass variables and mixins, responsive grid system,
-				extensive prebuilt components, and powerful JavaScript plugins.</p>
+			<h1 class="display-4 fw-bold lh-1 text-body-emphasis">Platformă de procesare a imaginilor</h1>
+			<p class="lead">Procesarea imaginii presupune o serie de operațiuni care transformă o imagine pentru a-i îmbunătăți calitatea sau pentru a extrage informații valoroase. Aceste operațiuni includ filtrarea, detectarea marginilor, conversia spațiului de culoare și transformările geometrice. Aceste tehnici pot îmbunătăți claritatea imaginii, pot detecta obiecte și pot pregăti imaginile pentru analize ulterioare.</p>
 			<div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4 mb-lg-3">
-				<button type="button" class="btn btn-primary btn-lg px-4 me-md-2 fw-bold">Primary</button>
-				<button type="button" class="btn btn-outline-secondary btn-lg px-4">Default</button>
+				<a href="#parameters_form" type="button" class="btn btn-primary btn-lg px-4 me-md-2 fw-bold">Încercă ACUM</a>
+				<a href="/results" type="button" class="btn btn-outline-secondary btn-lg px-4">Vezi rezultatele</a>
 			</div>
 		</div>
 		<div class="col-lg-4 offset-lg-1 p-0 overflow-hidden shadow-lg">
-			<img class="rounded-lg-3" src="{{ url_for('static', filename='assets/images/bootstrap-docs.png') }}" alt="Bootstrap Documentation" width="720">
+			<img class="rounded-lg-3" src="{{ url_for('static', filename='assets/images/the-concept-of-image-processing.jpg') }}" alt="Bootstrap Documentation" width="720">
 		</div>
 	</div>
 </div>
 
-<div class="container">
+<div id="parameters_form" class="container">
 	<!-- Main heading of the application -->
 	<h1 class="mb-4 text-center">Formular indicatori procesare</h1>
 	<!-- Form for uploading images and selecting actions -->
 	<form class="row g-3" action="/upload" method="post" enctype="multipart/form-data">
 		<div class="col-md-6">
-			<!-- Input for selecting an image file -->
+			<!-- Input pentru selectarea unui fișier imagine -->
 			<div class="mb-3">
-				<label for="image" class="form-label">Select image:</label>
+				<label for="image" class="form-label">Selectează imaginea:</label>
 				<input type="file" class="form-control" name="image" id="image" required>
 			</div>
 		</div>
 		<div class="col-md-6">
-			<!-- Add a select option for object detection model -->
+			<!-- Adaugă o opțiune de selectare pentru modelul de detecție a obiectelor -->
 			<div class="mb-3">
-				<label for="model" class="form-label">Select object detection model:</label>
+				<label for="model" class="form-label">Selectează modelul de detecție a obiectelor:</label>
 				<select class="form-select" name="model" id="model" required>
 					<option value="yolov5s">YOLOv5s</option>
 					<option value="yolov5n">YOLOv5n</option>
 				</select>
 			</div>
 		</div>
-		<!-- Add radio buttons for result selection -->
+		<!-- Adaugă butoane radio pentru selectarea rezultatului -->
 		<div class="col-md-12">
 			<div class="mb-3">
-				<label class="form-label">Select result option:</label>
+				<label class="form-label">Selectează opțiunea de rezultat:</label>
 				<div class="form-check">
 					<input class="form-check-input" type="radio" id="single_result" name="result_option" value="single"
 					       checked>
-					<label class="form-check-label" for="single_result">Single result per feature</label>
+					<label class="form-check-label" for="single_result">Un singur rezultat per algoritm</label>
 				</div>
 				<div class="form-check">
 					<input class="form-check-input" type="radio" id="all_results" name="result_option" value="all">
-					<label class="form-check-label" for="all_results">All results</label>
+					<label class="form-check-label" for="all_results">Toate rezultatele</label>
 				</div>
 			</div>
 		</div>
 		<hr>
-		<!-- Add select option for color space -->
+		<!-- Adaugă opțiunea de selectare pentru spațiul de culoare -->
 		<div class="col-md-12">
 			<div class="mb-3">
-				<label for="color_space" class="form-label">Select color space:</label>
+				<label for="color_space" class="form-label">Selectează spațiul de culoare:</label>
 				<select class="form-select" name="color_space" id="color_space" required>
 					<option value="RGB">RGB</option>
 					<option value="HSV">HSV</option>
@@ -99,79 +97,79 @@
 			</div>
 		</div>
 		<hr>
-		<!-- Add input for rotation angle -->
+		<!-- Adaugă input pentru unghiul de rotație -->
 		<div class="col-md-6">
 			<div class="mb-3">
-				<label for="rotation_angle" class="form-label">Rotation angle (degrees):</label>
+				<label for="rotation_angle" class="form-label">Unghiul de rotație (grade):</label>
 				<input type="number" class="form-control" name="rotation_angle" id="rotation_angle" value="0">
 			</div>
 		</div>
-		<!-- Add input for scale factor -->
+		<!-- Adaugă input pentru factorul de scalare -->
 		<div class="col-md-6">
 			<div class="mb-3">
-				<label for="scale_factor" class="form-label">Scale factor:</label>
+				<label for="scale_factor" class="form-label">Factor de scalare:</label>
 				<input type="number" class="form-control" step="0.1" name="scale_factor" id="scale_factor" value="1.0">
 			</div>
 		</div>
-		<!-- Add inputs for cropping -->
+		<!-- Adaugă inputuri pentru decupare -->
 		<div class="col-md-3">
 			<div class="mb-3">
-				<label for="crop_x" class="form-label">Crop X:</label>
+				<label for="crop_x" class="form-label">Decupare X:</label>
 				<input type="number" class="form-control" name="crop_x" id="crop_x" value="0">
 			</div>
 		</div>
 		<div class="col-md-3">
 			<div class="mb-3">
-				<label for="crop_y" class="form-label">Crop Y:</label>
+				<label for="crop_y" class="form-label">Decupare Y:</label>
 				<input type="number" class="form-control" name="crop_y" id="crop_y" value="0">
 			</div>
 		</div>
 		<div class="col-md-3">
 			<div class="mb-3">
-				<label for="crop_width" class="form-label">Crop width:</label>
+				<label for="crop_width" class="form-label">Lățimea decupării:</label>
 				<input type="number" class="form-control" name="crop_width" id="crop_width" value="300">
 			</div>
 		</div>
 		<div class="col-md-3">
 			<div class="mb-3">
-				<label for="crop_height" class="form-label">Crop height:</label>
+				<label for="crop_height" class="form-label">Înălțimea decupării:</label>
 				<input type="number" class="form-control" name="crop_height" id="crop_height" value="300">
 			</div>
 		</div>
-		<!-- Add select option for flip code -->
+		<!-- Adaugă opțiunea de selectare pentru codul de flipare -->
 		<div class="col-md-12">
 			<div class="mb-3">
-				<label for="flip_code" class="form-label">Flip code:</label>
+				<label for="flip_code" class="form-label">Cod de flipare:</label>
 				<select class="form-select" name="flip_code" id="flip_code">
-					<option value="1">Horizontal</option>
+					<option value="1">Orizontal</option>
 					<option value="0">Vertical</option>
-					<option value="-1">Both</option>
+					<option value="-1">Ambele</option>
 				</select>
 			</div>
 		</div>
 		<hr>
 		<div class="col-md-6">
-			<!-- Add select option for filter type -->
+			<!-- Adaugă opțiunea de selectare pentru tipul de filtru -->
 			<div class="mb-3">
-				<label for="filter_type" class="form-label">Select filter type:</label>
+				<label for="filter_type" class="form-label">Selectează tipul de filtru:</label>
 				<select class="form-select" name="filter_type" id="filter_type">
 					<option value="gaussian">Gaussian</option>
 					<option value="median">Median</option>
 				</select>
 			</div>
 		</div>
-		<!-- Add input for kernel size -->
+		<!-- Adaugă input pentru dimensiunea kernelului -->
 		<div class="col-md-6">
 			<div class="mb-3">
-				<label for="kernel_size" class="form-label">Kernel size:</label>
+				<label for="kernel_size" class="form-label">Dimensiunea kernelului:</label>
 				<input type="number" class="form-control" name="kernel_size" id="kernel_size" value="7">
 			</div>
 		</div>
 		<hr>
-		<!-- Add select option for edge detection algorithm -->
+		<!-- Adaugă opțiunea de selectare pentru algoritmul de detecție a marginilor -->
 		<div class="col-md-4">
 			<div class="mb-3">
-				<label for="edge_algorithm" class="form-label">Select edge detection algorithm:</label>
+				<label for="edge_algorithm" class="form-label">Selectează algoritmul de detecție a marginilor:</label>
 				<select class="form-select" name="edge_algorithm" id="edge_algorithm">
 					<option value="canny">Canny</option>
 					<option value="sobel">Sobel</option>
@@ -181,81 +179,75 @@
 				</select>
 			</div>
 		</div>
-		<!-- Add inputs for thresholds -->
+		<!-- Adaugă inputuri pentru praguri -->
 		<div class="col-md-4">
 			<div class="mb-3">
-				<label for="threshold1" class="form-label">Threshold 1:</label>
+				<label for="threshold1" class="form-label">Prag 1:</label>
 				<input type="number" class="form-control" name="threshold1" id="threshold1" value="100">
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="mb-3">
-				<label for="threshold2" class="form-label">Threshold 2:</label>
+				<label for="threshold2" class="form-label">Prag 2:</label>
 				<input type="number" class="form-control" name="threshold2" id="threshold2" value="200">
 			</div>
 		</div>
 		<hr>
-		<!-- Add select option for equalization type -->
+		<!-- Adaugă opțiunea de selectare pentru tipul de egalizare -->
 		<div class="col-md-4">
 			<div class="mb-3">
-				<label for="equalization_type" class="form-label">Select equalization type:</label>
+				<label for="equalization_type" class="form-label">Selectează tipul de egalizare:</label>
 				<select class="form-select" name="equalization_type" id="equalization_type">
-					<option value="ahe">Adaptive Histogram Equalization (AHE)</option>
-					<option value="clahe">Contrast-Limited Adaptive Histogram Equalization (CLAHE)</option>
+					<option value="ahe">Egalizare Adaptive Histogram (AHE)</option>
+					<option value="clahe">Egalizare Adaptive Histogram Limitată de Contrast (CLAHE)</option>
 				</select>
 			</div>
 		</div>
-		<!-- Add inputs for CLAHE parameters -->
+		<!-- Adaugă inputuri pentru parametrii CLAHE -->
 		<div class="col-md-4">
 			<div class="mb-3">
-				<label for="clip_limit" class="form-label">Clip Limit (for CLAHE):</label>
+				<label for="clip_limit" class="form-label">Limită de tăiere (pentru CLAHE):</label>
 				<input type="number" class="form-control" name="clip_limit" id="clip_limit" value="2.0" step="0.1">
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="mb-3">
-				<label for="tile_grid_size" class="form-label">Tile Grid Size (for CLAHE):</label>
+				<label for="tile_grid_size" class="form-label">Dimensiunea grilei de plăci (pentru CLAHE):</label>
 				<input type="number" class="form-control" name="tile_grid_size" id="tile_grid_size" value="8">
 			</div>
 		</div>
 		<hr>
-		<!-- Add select option for enhancement type -->
+		<!-- Adaugă opțiunea de selectare pentru tipul de îmbunătățire -->
 		<div class="col-md-6">
 			<div class="mb-3">
-				<label for="enhancement_type" class="form-label">Select enhancement type:</label>
+				<label for="enhancement_type" class="form-label">Selectează tipul de îmbunătățire:</label>
 				<select class="form-select" name="enhancement_type" id="enhancement_type">
-					<option value="sharpen">Sharpen</option>
-					<option value="denoise">Denoise</option>
-					<option value="brightness">Adjust Brightness</option>
-					<option value="contrast">Adjust Contrast</option>
+					<option value="sharpen">Ascuțire</option>
+					<option value="denoise">Reducere zgomot</option>
+					<option value="brightness">Ajustare luminozitate</option>
+					<option value="contrast">Ajustare contrast</option>
 				</select>
 			</div>
 		</div>
-		<!-- Add input for enhancement value -->
+		<!-- Adaugă input pentru valoarea îmbunătățirii -->
 		<div class="col-md-6">
 			<div class="mb-3">
-				<label for="enhancement_value" class="form-label">Enhancement value:</label>
+				<label for="enhancement_value" class="form-label">Valoarea îmbunătățirii:</label>
 				<input type="number" class="form-control" name="enhancement_value" id="enhancement_value" value="1.0"
 				       step="0.1">
 			</div>
 		</div>
-		<!-- Submit button for the form -->
+		<!-- Buton de trimitere pentru formular -->
 		<div class="col-md-2">
-			<button type="submit" class="btn btn-primary">Upload</button>
+			<button type="submit" class="btn btn-primary">Încarcă</button>
 		</div>
 	</form>
 </div>
 
 <div class="container my-5">
 	<div class="position-relative p-5 text-center text-muted bg-body border border-dashed rounded-5">
-		<svg class="bi mt-5 mb-3" width="48" height="48">
-			<use xlink:href="#check2-circle"/>
-		</svg>
-		<h1 class="text-body-emphasis">Placeholder jumbotron</h1>
-		<p class="col-lg-6 mx-auto mb-4">
-			This faded back jumbotron is useful for placeholder content. It's also a great way to add a bit of context
-			to a page or section when no content is available and to encourage visitors to take a specific action.
-		</p>
+		<h1 class="mt-6 text-body-emphasis">Aplicații</h1>
+		<p class="col-lg-6 mx-auto mb-4">Aplicațiile de procesare și analiză a imaginilor sunt vaste și diverse, variind de la imagistica medicală și vehicule autonome până la recunoașterea facială și automatizarea industrială. În imagistica medicală, de exemplu, tehnicile de procesare a imaginii îmbunătățesc vizibilitatea structurilor din corpul uman, ajutând la diagnosticarea precisă și planificarea tratamentului. În vehiculele autonome, analiza în timp real a imaginii este crucială pentru detectarea obstacolelor, recunoașterea semnelor de circulație și asigurarea unei navigații sigure.</p>
 		<button class="btn btn-primary px-5 mb-5" type="button">Trimite un email</button>
 	</div>
 </div>

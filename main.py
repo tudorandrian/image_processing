@@ -190,10 +190,10 @@ def results():
 
         # Dictionary of color spaces with descriptions
         color_space_descriptions = {
-            'HSV': 'Hue, Saturation, and Value color space.',
-            'LAB': 'CIE L*a*b* color space.',
-            'GRAY': 'Grayscale color space.',
-            'RGB': 'RGB color space.',
+            'HSV': 'Hue, Saturation, and Value (HSV) color space represents colors in terms of their shade (hue), intensity (saturation), and brightness (value). It is often used in image processing for color-based segmentation and filtering.',
+            'LAB': 'CIE L*a*b* (LAB) color space is a color-opponent space with dimension L for lightness and a and b for the color-opponent dimensions. It is designed to approximate human vision and is used for color comparison and conversion.',
+            'GRAY': 'Grayscale color space represents images in shades of gray, with each pixel corresponding to an intensity value. It is commonly used in image processing tasks where color information is not necessary, such as edge detection and thresholding.',
+            'RGB': 'RGB color space represents images using the three primary colors: Red, Green, and Blue. Each color is represented by a combination of these three colors, and it is widely used in digital imaging and display technologies.'
         }
 
         # Ensure filtered_image_paths has enough elements
@@ -208,8 +208,8 @@ def results():
 
         # Dictionary of filter types with descriptions
         filter_type_descriptions = {
-            'gaussian': 'Gaussian Blur filter.',
-            'median': 'Median Blur filter.'
+            'gaussian': 'Gaussian Blur filter applies a Gaussian function to the image, smoothing it by reducing noise and detail. It is useful for reducing image noise and detail, often used in preprocessing steps to enhance the performance of other algorithms.',
+            'median': 'Median Blur filter replaces each pixel\'s value with the median value of the neighboring pixels. This filter is effective in removing salt-and-pepper noise while preserving edges, making it suitable for images with high levels of noise.'
         }
 
         # Ensure edge_detected_image_paths has enough elements
@@ -224,11 +224,11 @@ def results():
 
         # Dictionary of edge detection algorithms with descriptions
         edge_algorithm_descriptions = {
-            'canny': 'Canny edge detection algorithm.',
-            'sobel': 'Sobel edge detection algorithm.',
-            'scharr': 'Scharr edge detection algorithm.',
-            'roberts': 'Roberts edge detection algorithm.',
-            'log': 'Laplacian of Gaussian (LoG) edge detection algorithm.'
+            'canny': 'Canny edge detection algorithm uses a multi-stage process to detect a wide range of edges in images. It involves noise reduction, gradient calculation, non-maximum suppression, and edge tracking by hysteresis.',
+            'sobel': 'Sobel edge detection algorithm calculates the gradient of the image intensity at each pixel, emphasizing regions of high spatial frequency that correspond to edges. It uses convolution with Sobel kernels to approximate the derivatives.',
+            'scharr': 'Scharr edge detection algorithm is a variation of the Sobel operator that provides a better approximation of the gradient magnitude, especially for diagonal edges. It uses specific convolution kernels to achieve this.',
+            'roberts': 'Roberts edge detection algorithm performs a simple, quick computation of the gradient magnitude using a pair of 2x2 convolution kernels. It is particularly sensitive to high-frequency noise and is best suited for detecting edges in images with sharp transitions.',
+            'log': 'Laplacian of Gaussian (LoG) edge detection algorithm combines Gaussian smoothing with the Laplacian operator to detect edges. It first smooths the image to reduce noise and then applies the Laplacian to highlight regions of rapid intensity change.'
         }
 
         # Ensure equalized_image_paths has enough elements
@@ -243,8 +243,8 @@ def results():
 
         # Dictionary of equalization types with descriptions
         equalization_type_descriptions = {
-            'ahe': 'Adaptive Histogram Equalization.',
-            'clahe': 'Contrast Limited Adaptive Histogram Equalization.'
+            'ahe': 'Adaptive Histogram Equalization (AHE) improves the contrast of an image by transforming the values in the intensity histogram. It works by dividing the image into small regions and applying histogram equalization to each region independently, which enhances local contrast and brings out more details in the image.',
+            'clahe': 'Contrast Limited Adaptive Histogram Equalization (CLAHE) is a variant of AHE that prevents over-amplification of noise by limiting the contrast enhancement. It divides the image into small regions and applies histogram equalization to each region, but with a clip limit to control the maximum contrast. This results in a more balanced enhancement, reducing noise while improving the visibility of details.'
         }
 
         # Check if a person is detected and perform emotion detection
@@ -264,10 +264,10 @@ def results():
 
         # Dictionary of enhancement types with descriptions
         enhancement_type_descriptions = {
-            'sharpen': 'Sharpens the image.',
-            'denoise': 'Reduces noise in the image.',
-            'brightness': 'Adjusts the brightness of the image.',
-            'contrast': 'Adjusts the contrast of the image.'
+            'sharpen': 'Sharpens the image by enhancing the edges and fine details, making the image appear clearer and more defined.',
+            'denoise': 'Reduces noise in the image, which can be caused by low light conditions or high ISO settings, resulting in a smoother and cleaner image.',
+            'brightness': 'Adjusts the brightness of the image, making it lighter or darker. This can help improve visibility in underexposed or overexposed areas.',
+            'contrast': 'Adjusts the contrast of the image, enhancing the difference between the light and dark areas. This can make the image appear more vivid and dynamic.'
         }
 
         # Render the results template with the processed images and descriptions

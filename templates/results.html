@@ -96,12 +96,12 @@
 		<div class="container">
 			<div class="row">
 				<div class="col">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Original Image</h3>
-					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagine originală</h3>
+					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=filename) }}" alt="Imagine încărcată">
 				</div>
 				<div class="col">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Transformed Image(Crop, flit etc.)</h3>
-					<img src="{{ url_for('uploaded_file', filename=transformed_image) }}" alt="Transformed Image">
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagine transformată (decupare, rotire etc.)</h3>
+					<img src="{{ url_for('uploaded_file', filename=transformed_image) }}" alt="Imagine transformată">
 				</div>
 			</div>
 			<hr class="m-5">
@@ -111,11 +111,11 @@
 		<div id="objects" class="container">
 			<div class="row">
 				<div class="col">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Processed Image</h3>
-					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=processed_image) }}" alt="Processed Image">
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagine procesată</h3>
+					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=processed_image) }}" alt="Imagine procesată">
 				</div>
 				<div class="col">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Detected Objects</h3>
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Obiecte detectate</h3>
 					<ul>
 						{% for detected_class in detected_classes %}
 						<li>{{ detected_class }}</li>
@@ -131,20 +131,20 @@
 			<div id="segmented" class="container">
 				<div class="row">
 					<div class="col">
-						<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Image with Face Detection</h3>
-						<img src="{{ url_for('uploaded_file', filename=processed_image_person) }}" alt="Image with Face Detection">
+						<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagine cu detecție facială</h3>
+						<img src="{{ url_for('uploaded_file', filename=processed_image_person) }}" alt="Imagine cu detecție facială">
 					</div>
 					<div class="col">
-						<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Emotion Analysis Results</h3>
+						<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Rezultate analiză emoții</h3>
 						{% for result in emotions %}
-							<p><b>Dominant Emotion:</b> {{ result['dominant_emotion'] }}</p>
-							<p><b>Face Confidence:</b> {{ result['face_confidence'] }}</p>
-							<p><b>Emotions:</b></p>
+							<p><b>Emoția dominantă:</b> {{ result['dominant_emotion'] }}</p>
+							<p><b>Încredere față:</b> {{ result['face_confidence'] }}</p>
+							<p><b>Emoții:</b></p>
 							{% for emotion, value in result['emotion'].items() %}
 							- {{ emotion }}: {{ value }} <br>
 							{% endfor %}
 							<br>
-							<p><b>Region:</b> {{ result['region'] }}</p>
+							<p><b>Regiune:</b> {{ result['region'] }}</p>
 						    <hr>
 						{% endfor %}
 					</div>
@@ -157,15 +157,15 @@
 		<div class="container">
 			<div class="row">
 				<div class="col">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Segmented Image</h3>
-					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Segmented Image">
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagine segmentată</h3>
+					<img class="img-fluid" src="{{ url_for('uploaded_file', filename=segmented_image) }}" alt="Imagine segmentată">
 				</div>
 				<div class="col">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Segmentation Metrics</h3>
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Metrici segmentare</h3>
 					<ul>
-						<li>Number of Segments: {{ segmentation_metrics.num_segments }}</li>
+						<li>Număr de segmente: {{ segmentation_metrics.num_segments }}</li>
 						{% for segment in segmentation_metrics.segments[:10] %}
-						<li>Segment ID: {{ segment.segment_id }}, Area: {{ segment.area }}, Percentage: {{
+						<li>ID segment: {{ segment.segment_id }}, Suprafață: {{ segment.area }}, Procentaj: {{
 							segment.percentage }}%
 						</li>
 						{% endfor %}
@@ -179,14 +179,14 @@
 			<!-- Filtered Images Section -->
 			<div id="filtered_all" class="album py-5 bg-body-tertiary">
 				<div class="container">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Filtered Images</h3>
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagini filtrate</h3>
 					<div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3">
 						{% for filter_type, image in filtered_images.items() %}
 							<div class="col">
 								<div class="card shadow-sm">
 									<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ filter_type }} Image">
 									<div class="card-body">
-										<h5 class="card-title">{{ filter_type | capitalize }} Filter</h5>
+										<h5 class="card-title">Filtru {{ filter_type | capitalize }}</h5>
 										<p class="card-text">{{ filter_type_descriptions[filter_type] }}</p>
 									</div>
 								</div>
@@ -199,14 +199,14 @@
 			<!-- Equalized Images Section -->
 			<div id="equalized_all" class="album py-5 bg-body-tertiary">
 				<div class="container">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Equalized Images</h3>
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagini egalizate</h3>
 					<div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3">
 						{% for equalization_type, image in equalized_images.items() %}
 							<div class="col">
 								<div class="card shadow-sm">
 									<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ equalization_type }} Image">
 									<div class="card-body">
-										<h5 class="card-title">{{ equalization_type | capitalize }} Equalization</h5>
+										<h5 class="card-title">Egalizare {{ equalization_type | capitalize }}</h5>
 										<p class="card-text">{{ equalization_type_descriptions[equalization_type] }}</p>
 									</div>
 								</div>
@@ -219,14 +219,14 @@
 			<!-- Enhanced Images Section -->
 			<div id="enhanced_all" class="album py-5 bg-body-tertiary">
 				<div class="container">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Enhanced Images</h3>
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagini îmbunătățite</h3>
 					<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
 						{% for enhancement_type, image in enhanced_images.items() %}
 							<div class="col">
 								<div class="card shadow-sm">
 									<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ enhancement_type }} Image">
 									<div class="card-body">
-										<h5 class="card-title">{{ enhancement_type | capitalize }} Enhancement</h5>
+										<h5 class="card-title">Îmbunătățire {{ enhancement_type | capitalize }}</h5>
 										<p class="card-text">{{ enhancement_type_descriptions[enhancement_type] }}</p>
 									</div>
 								</div>
@@ -239,14 +239,14 @@
 			<!-- Converted Images Section -->
 			<div id="converted_all" class="album py-5 bg-body-tertiary">
 				<div class="container">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Converted Images</h3>
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Imagini convertite</h3>
 					<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
 						{% for color_space, image in converted_images.items() %}
 							<div class="col">
 								<div class="card shadow-sm">
 									<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ color_space }} Image">
 									<div class="card-body">
-										<h5 class="card-title">{{ color_space }} Color Space</h5>
+										<h5 class="card-title">Spațiu de culoare {{ color_space }}</h5>
 										<p class="card-text">{{ color_space_descriptions[color_space] }}</p>
 									</div>
 								</div>
@@ -259,14 +259,14 @@
 			<!-- Edge-detected Images Section -->
 			<div id="edge_detected_all" class="album py-5 bg-body-tertiary">
 				<div class="container">
-					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Edge Detection</h3>
+					<h3 class="fw-bold mb-4 fs-4 text-body-emphasis">Detecție margini</h3>
 					<div class="row g-3">
 						{% for algorithm, image in edge_detected_images.items() %}
 							<div class="col">
 								<div class="card shadow-sm">
 									<img class="img-fluid" src="{{ url_for('uploaded_file', filename=image) }}" alt="{{ algorithm }} Image">
 									<div class="card-body">
-										<h5 class="card-title">{{ algorithm | capitalize }} Algorithm</h5>
+										<h5 class="card-title">Algoritm {{ algorithm | capitalize }}</h5>
 										<p class="card-text">{{ edge_algorithm_descriptions[algorithm] }}</p>
 									</div>
 								</div>
@@ -285,8 +285,8 @@
 								{% if filter_type in filtered_images %}
 									<img class="bd-placeholder-img card-img-top" src="{{ url_for('uploaded_file', filename=filtered_images[filter_type]) }}" alt="{{ filter_type }} Image">
 									<div class="card-body">
-										<h5 class="card-title">Filtered Images</h5>
-										<h6 class="card-subtitle mb-2 text-body-secondary">{{ filter_type | capitalize }} Filter</h6>
+										<h5 class="card-title">Imagini filtrate</h5>
+										<h6 class="card-subtitle mb-2 text-body-secondary">Filtru {{ filter_type | capitalize }}</h6>
 										<p class="card-text">{{ filter_type_descriptions[filter_type] }}</p>
 									</div>
 								{% endif %}
@@ -298,8 +298,8 @@
 								{% if equalization_type in equalized_images %}
 									<img class="bd-placeholder-img card-img-top" src="{{ url_for('uploaded_file', filename=equalized_images[equalization_type]) }}" alt="{{ equalization_type }} Image">
 									<div class="card-body">
-										<h5 class="card-title">Equalized Image</h5>
-										<h6 class="card-subtitle mb-2 text-body-secondary">{{ equalization_type | capitalize }} Equalization</h6>
+										<h5 class="card-title">Imagine egalizată</h5>
+										<h6 class="card-subtitle mb-2 text-body-secondary">Egalizare {{ equalization_type | capitalize }}</h6>
 										<p class="card-text">{{ equalization_type_descriptions[equalization_type] }}</p>
 									</div>
 								{% endif %}
@@ -311,8 +311,8 @@
 								{% if enhancement_type in enhanced_images %}
 									<img class="bd-placeholder-img card-img-top" src="{{ url_for('uploaded_file', filename=enhanced_images[enhancement_type]) }}" alt="{{ enhancement_type }} Image">
 									<div class="card-body">
-										<h5 class="card-title">Convert Image</h5>
-										<h6 class="card-subtitle mb-2 text-body-secondary">{{ enhancement_type | capitalize }} Enhancement</h6>
+										<h5 class="card-title">Imagine îmbunătățită</h5>
+										<h6 class="card-subtitle mb-2 text-body-secondary">Îmbunătățire {{ enhancement_type | capitalize }}</h6>
 										<p class="card-text">{{ enhancement_type_descriptions[enhancement_type] }}</p>
 									</div>
 								{% endif %}
@@ -324,8 +324,8 @@
 								{% if color_space in converted_images %}
 									<img class="bd-placeholder-img card-img-top" src="{{ url_for('uploaded_file', filename=converted_images[color_space]) }}" alt="{{ color_space }} Image">
 									<div class="card-body">
-										<h5 class="card-title">Convert Image</h5>
-										<h6 class="card-subtitle mb-2 text-body-secondary">{{ color_space }} Color Space</h6>
+										<h5 class="card-title">Imagine convertită</h5>
+										<h6 class="card-subtitle mb-2 text-body-secondary">Spațiu de culoare {{ color_space }}</h6>
 										<p class="card-text">{{ color_space_descriptions[color_space] }}</p>
 									</div>
 								{% endif %}
@@ -337,8 +337,8 @@
 								{% if edge_algorithm in edge_detected_images %}
 									<img class="bd-placeholder-img card-img-top" src="{{ url_for('uploaded_file', filename=edge_detected_images[edge_algorithm]) }}" alt="{{ edge_algorithm }} Image">
 									<div class="card-body">
-										<h5 class="card-title">Edge Detection</h5>
-										<h6 class="card-subtitle mb-2 text-body-secondary">{{ edge_algorithm | capitalize }} Algorithm</h6>
+										<h5 class="card-title">Detecție margini</h5>
+										<h6 class="card-subtitle mb-2 text-body-secondary">Algoritmul {{ edge_algorithm | capitalize }}</h6>
 										<p class="card-text">{{ edge_algorithm_descriptions[edge_algorithm] }}</p>
 									</div>
 								{% endif %}
